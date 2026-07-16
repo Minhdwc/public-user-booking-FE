@@ -1,6 +1,7 @@
-import apiClient from './client';
-import type { Sport } from './types';
+import { unwrapList } from '@/lib/api/response';
+import type { Sport } from '@/lib/api/types';
+import { sportService } from '@/lib/service';
 
 export async function getSports(): Promise<Sport[]> {
-  return apiClient.get('/sports');
+  return unwrapList(await sportService.getSports({ limit: 100 }));
 }

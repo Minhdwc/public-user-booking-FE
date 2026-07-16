@@ -53,7 +53,7 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
           </p>
         </div>
 
-        <VenueGallery images={data.images} venueName={data.name} />
+        <VenueGallery images={data.images ?? []} venueName={data.name} />
 
         {data.description ? (
           <p className="text-muted-foreground">{data.description}</p>
@@ -66,19 +66,21 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
         <div>
           <h2 className="text-xl font-semibold">Danh sách sân</h2>
           <p className="text-sm text-muted-foreground">
-            {data.fields.length} sân đang hoạt động
+            {data.fields?.length ?? 0} sân đang hoạt động
           </p>
         </div>
 
-        {data.fields.length === 0 ? (
+        {!data.fields?.length ? (
           <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
             Cụm sân này chưa có sân active nào.
           </p>
         ) : (
           <div className="space-y-4">
-            {data.fields.map((field) => (
-              <FieldCard key={field.id} field={field} />
-            ))}
+            {data.fields
+              .filter((field) => field.sport)
+              .map((field) => (
+                <FieldCard key={field.id} field={field as typeof field & { sport: NonNullable<typeof field.sport> }} />
+              ))}
           </div>
         )}
       </section>

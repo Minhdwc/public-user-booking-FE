@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { AuthHydrator } from '@/components/providers/auth-hydrator';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { cn } from '@/lib/utils';
 import './globals.css';
 
 const geistSans = Geist({
@@ -26,13 +28,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
-        <QueryProvider>
-          <AuthHydrator />
-          {children}
-          <Toaster richColors position="top-right" />
-        </QueryProvider>
+    <html lang="vi" suppressHydrationWarning>
+      <body
+        className={cn(
+          geistSans.variable,
+          geistMono.variable,
+          'flex min-h-full flex-col bg-background text-foreground antialiased',
+        )}
+      >
+        <ThemeProvider>
+          <QueryProvider>
+            <AuthHydrator />
+            {children}
+            <Toaster richColors position="top-right" />
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

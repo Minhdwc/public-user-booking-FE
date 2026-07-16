@@ -1,10 +1,11 @@
-import apiClient from './client';
-import type { UploadResponse } from './types';
+import type { UploadFolder, UploadResponse } from '@/lib/api/types';
+import { uploadService } from '@/lib/service';
 
-export type UploadFolder = 'avatars' | 'venues' | 'fields';
+export type { UploadFolder };
 
-export async function uploadFile(file: File, folder: UploadFolder = 'avatars'): Promise<UploadResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-  return apiClient.post(`/uploads?folder=${folder}`, formData);
+export async function uploadFile(
+  file: File,
+  folder: UploadFolder = 'avatars',
+): Promise<UploadResponse> {
+  return uploadService.upload(file, folder);
 }

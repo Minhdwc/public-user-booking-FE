@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, User } from 'lucide-react';
 import { useState } from 'react';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -52,6 +53,8 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+
           {isHydrated && isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

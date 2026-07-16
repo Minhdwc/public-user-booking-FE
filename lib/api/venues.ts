@@ -1,17 +1,17 @@
-import apiClient from './client';
-import type { GetVenuesParams, VenueWithFields } from './types';
+import { unwrapList } from '@/lib/api/response';
+import { mapVenue } from '@/lib/api/mappers';
+import type { GetVenuesParams, VenueWithFields } from '@/lib/api/types';
+import { venueService } from '@/lib/service';
 
 export async function getVenues(params: GetVenuesParams = {}): Promise<VenueWithFields[]> {
-  const { search, page = 1, limit = 10 } = params;
-  return apiClient.get('/venues', {
-    params: {
-      search: search || undefined,
-      page,
-      limit,
-    },
+  const payload = await venueService.getVenues({
+    page: params.page ?? 1,
+    limit: params.limit ?? 10,
+    search: params.search,
   });
+  return unwrapList(payload).map(mapVenue);
 }
 
 export async function getVenueById(id: string): Promise<VenueWithFields> {
-  return apiClient.get(`/venues/${id}`);
+  return mapVenue(await venueService.getVenue(id));
 }

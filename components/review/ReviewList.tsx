@@ -33,7 +33,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
           <li key={review.id} className="rounded-xl border p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-medium">{review.user.name}</p>
+                <p className="font-medium">{review.user?.name ?? 'Người dùng'}</p>
                 <p className="text-xs text-muted-foreground">{formatDate(review.createdAt)}</p>
               </div>
               <RatingStars rating={review.rating} size="sm" />

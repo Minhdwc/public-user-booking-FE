@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -9,10 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ApiError } from '@/lib/api/errors';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { buildLoginUrl } from '@/lib/utils/auth-action';
 import { normalizeVnPhone } from '@/lib/utils/phone';
 import { registerSchema, type RegisterFormValues } from '@/lib/validations/auth';
 
 export function RegisterForm() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
   const { register: registerUser, isRegistering, getApiErrorMessage } = useAuth();
 
   const {
@@ -34,13 +38,16 @@ export function RegisterForm() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     try {
-      await registerUser({
-        name: values.name,
-        username: values.username,
-        email: values.email,
-        phone: normalizeVnPhone(values.phone),
-        password: values.password,
-      });
+      await registerUser(
+        {
+          name: values.name,
+          username: values.username,
+          email: values.email,
+          phone: normalizeVnPhone(values.phone),
+          password: values.password,
+        },
+        redirectTo ?? undefined,
+      );
     } catch (error) {
       const message = getApiErrorMessage(error);
       if (error instanceof ApiError && error.statusCode === 409) {
@@ -120,7 +127,10 @@ export function RegisterForm() {
 
           <p className="text-center text-sm text-muted-foreground">
             Đã có tài khoản?{' '}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link
+              href={buildLoginUrl(redirectTo)}
+              className="font-medium text-primary hover:underline"
+            >
               Đăng nhập
             </Link>
           </p>

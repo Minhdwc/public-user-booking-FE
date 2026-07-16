@@ -1,5 +1,7 @@
-import apiClient from './client';
-import type { User } from './types';
+import type { AccountMe } from '@/lib/api/types';
+import { accountService } from '@/lib/service';
+
+export type { AccountMe };
 
 export interface UpdateProfilePayload {
   name?: string;
@@ -13,18 +15,16 @@ export interface ChangePasswordPayload {
   newPassword: string;
 }
 
-export interface AccountMe extends User {
-  permissions?: string[];
-}
-
 export async function getMe(): Promise<AccountMe> {
-  return apiClient.get('/account/me');
+  return accountService.getMe();
 }
 
 export async function updateProfile(payload: UpdateProfilePayload): Promise<AccountMe> {
-  return apiClient.patch('/account/profile', payload);
+  return accountService.updateProfile(payload);
 }
 
-export async function changePassword(payload: ChangePasswordPayload): Promise<{ success: boolean }> {
-  return apiClient.patch('/account/change-password', payload);
+export async function changePassword(
+  payload: ChangePasswordPayload,
+): Promise<{ success: boolean }> {
+  return accountService.changePassword(payload);
 }

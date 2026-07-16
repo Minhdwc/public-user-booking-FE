@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ApiError } from '@/lib/api/errors';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { buildRegisterUrl } from '@/lib/utils/auth-action';
 import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
 
 export function LoginForm() {
@@ -44,7 +45,9 @@ export function LoginForm() {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle>Đăng nhập</CardTitle>
-        <CardDescription>Đăng nhập để đặt sân và quản lý tài khoản</CardDescription>
+        <CardDescription>
+          Duyệt sân tự do — chỉ cần đăng nhập khi đặt sân hoặc quản lý tài khoản
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -75,7 +78,10 @@ export function LoginForm() {
 
           <p className="text-center text-sm text-muted-foreground">
             Chưa có tài khoản?{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
+            <Link
+              href={buildRegisterUrl(redirectTo)}
+              className="font-medium text-primary hover:underline"
+            >
               Đăng ký
             </Link>
           </p>

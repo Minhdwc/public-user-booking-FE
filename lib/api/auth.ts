@@ -1,5 +1,5 @@
-import apiClient from './client';
-import type { LoginResponse } from './types';
+import type { LoginResponse } from '@/lib/api/types';
+import { authService } from '@/lib/service';
 
 export interface LoginPayload {
   email: string;
@@ -15,13 +15,13 @@ export interface RegisterPayload {
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
-  return apiClient.post('/auth/login', payload);
+  return authService.login(payload);
 }
 
 export async function register(payload: RegisterPayload): Promise<LoginResponse> {
-  return apiClient.post('/auth/register', payload);
+  return authService.register(payload);
 }
 
 export async function logout(): Promise<{ success: boolean }> {
-  return apiClient.post('/auth/logout');
+  return authService.logout();
 }

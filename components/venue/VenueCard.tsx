@@ -11,9 +11,9 @@ interface VenueCardProps {
 }
 
 export function VenueCard({ venue }: VenueCardProps) {
-  const coverImage = venue.images[0];
-  const sports = getVenueSports(venue.fields);
-  const minPrice = getMinFieldPrice(venue.fields);
+  const coverImage = venue.images?.[0];
+  const sports = getVenueSports(venue.fields ?? []);
+  const minPrice = getMinFieldPrice(venue.fields ?? []);
 
   return (
     <Link href={`/venues/${venue.id}`} className="group block h-full">
@@ -43,7 +43,7 @@ export function VenueCard({ venue }: VenueCardProps) {
 
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="rounded-full bg-secondary px-2.5 py-1 font-medium">
-              {venue.fields.length} sân
+              {venue.fields?.length ?? 0} sân
             </span>
             {minPrice !== null ? (
               <span className="text-muted-foreground">Từ {formatPrice(minPrice)}/giờ</span>

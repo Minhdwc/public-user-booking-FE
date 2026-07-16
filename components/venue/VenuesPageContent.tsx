@@ -49,7 +49,9 @@ export function VenuesPageContent() {
   const filteredVenues = useMemo(() => {
     const venues = venuesQuery.data ?? [];
     if (!sportId) return venues;
-    return venues.filter((venue) => venue.fields.some((field) => field.sportId === sportId));
+    return venues.filter((venue) =>
+      (venue.fields ?? []).some((field) => field.sportId === sportId),
+    );
   }, [venuesQuery.data, sportId]);
 
   const hasNext = (venuesQuery.data?.length ?? 0) === PAGE_SIZE;

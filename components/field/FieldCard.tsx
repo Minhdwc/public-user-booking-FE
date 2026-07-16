@@ -12,7 +12,7 @@ interface FieldCardProps {
 }
 
 export function FieldCard({ field, showVenueLink = false, venueName }: FieldCardProps) {
-  const coverImage = field.images[0];
+  const coverImage = field.images?.[0];
 
   return (
     <Card className="overflow-hidden">

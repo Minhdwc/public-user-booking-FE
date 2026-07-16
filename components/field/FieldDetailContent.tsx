@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { BookingPlaceholder } from '@/components/field/BookingPlaceholder';
+import { BookingPanel } from '@/components/field/BookingPanel';
 import { FieldInfo } from '@/components/field/FieldInfo';
 import { ReviewList } from '@/components/review/ReviewList';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -54,15 +54,19 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
   return (
     <div className="space-y-10">
       <Link
-        href={`/venues/${fieldQuery.data.venue.id}`}
+        href={fieldQuery.data.venue ? `/venues/${fieldQuery.data.venue.id}` : '/venues'}
         className="text-sm text-primary hover:underline"
       >
-        ← Quay lại {fieldQuery.data.venue.name}
+        ← Quay lại {fieldQuery.data.venue?.name ?? 'danh sách sân'}
       </Link>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <FieldInfo field={fieldQuery.data} />
-        <BookingPlaceholder />
+        <BookingPanel
+          fieldId={fieldQuery.data.id}
+          fieldName={fieldQuery.data.name}
+          price={fieldQuery.data.price}
+        />
       </div>
 
       <Card>

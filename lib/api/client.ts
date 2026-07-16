@@ -85,7 +85,19 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<ApiErrorBody>) => {
     const status = error.response?.status;
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-    const message = error.response?.data?.message
+
+    // No HTTP response → server down / CORS / wrong NEXT_PUBLIC_API_URL
+    if (!error.response) {
+      const networkMessage =
+        !baseURL
+          ? 'Thiếu NEXT_PUBLIC_API_URL'
+          : error.code === 'ECONNABORTED'
+            ? 'Máy chủ API phản hồi quá chậm'
+            : `Không kết nối được API (${baseURL}). Kiểm tra backend đang chạy.`;
+      return Promise.reject(new ApiError(0, networkMessage));
+    }
+
+    const message = error.response.data?.message
       ? normalizeApiErrorMessage(error.response.data.message)
       : error.message || 'Đã xảy ra lỗi';
 

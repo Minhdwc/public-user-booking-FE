@@ -25,11 +25,11 @@ export function useAuth() {
     return data;
   };
 
-  const register = async (payload: authApi.RegisterPayload) => {
+  const register = async (payload: authApi.RegisterPayload, redirectTo?: string) => {
     const data = await registerMutation.mutateAsync(payload);
     setAuth(data.user, data.accessToken, data.refreshToken);
     toast.success('Đăng ký thành công');
-    router.replace('/');
+    router.replace(getSafeRedirectPath(redirectTo));
     return data;
   };
 
