@@ -94,9 +94,7 @@ export function BookingsPageContent() {
       <ErrorState
         title="Không tải được lịch đặt sân"
         message={
-          bookingsQuery.error instanceof Error
-            ? bookingsQuery.error.message
-            : 'Vui lòng thử lại'
+          bookingsQuery.error instanceof Error ? bookingsQuery.error.message : 'Vui lòng thử lại'
         }
         onRetry={() => bookingsQuery.refetch()}
       />

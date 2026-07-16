@@ -23,9 +23,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <RatingStars rating={average} showValue size="md" />
-        <span className="text-sm text-muted-foreground">
-          {reviews.length} đánh giá
-        </span>
+        <span className="text-sm text-muted-foreground">{reviews.length} đánh giá</span>
       </div>
 
       <ul className="space-y-4">

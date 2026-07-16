@@ -2,12 +2,7 @@
 
 import { useState } from 'react';
 import { ImagePlaceholder } from '@/components/common/ImagePlaceholder';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 interface ImageGalleryProps {

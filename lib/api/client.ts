@@ -17,9 +17,7 @@ let refreshPromise: Promise<RefreshResponse> | null = null;
 function isAuthEndpoint(url?: string) {
   if (!url) return false;
   return (
-    url.includes('/auth/login') ||
-    url.includes('/auth/register') ||
-    url.includes('/auth/refresh')
+    url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/refresh')
   );
 }
 
@@ -88,12 +86,11 @@ apiClient.interceptors.response.use(
 
     // No HTTP response → server down / CORS / wrong NEXT_PUBLIC_API_URL
     if (!error.response) {
-      const networkMessage =
-        !baseURL
-          ? 'Thiếu NEXT_PUBLIC_API_URL'
-          : error.code === 'ECONNABORTED'
-            ? 'Máy chủ API phản hồi quá chậm'
-            : `Không kết nối được API (${baseURL}). Kiểm tra backend đang chạy.`;
+      const networkMessage = !baseURL
+        ? 'Thiếu NEXT_PUBLIC_API_URL'
+        : error.code === 'ECONNABORTED'
+          ? 'Máy chủ API phản hồi quá chậm'
+          : `Không kết nối được API (${baseURL}). Kiểm tra backend đang chạy.`;
       return Promise.reject(new ApiError(0, networkMessage));
     }
 
@@ -101,7 +98,12 @@ apiClient.interceptors.response.use(
       ? normalizeApiErrorMessage(error.response.data.message)
       : error.message || 'Đã xảy ra lỗi';
 
-    if (status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint(originalRequest.url)) {
+    if (
+      status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint(originalRequest.url)
+    ) {
       originalRequest._retry = true;
 
       try {

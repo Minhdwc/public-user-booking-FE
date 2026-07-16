@@ -17,10 +17,7 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
   .object({
-    name: z
-      .string()
-      .min(2, 'Tên phải có ít nhất 2 ký tự')
-      .max(100, 'Tên không được quá 100 ký tự'),
+    name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự').max(100, 'Tên không được quá 100 ký tự'),
     username: z
       .string()
       .min(3, 'Username phải có ít nhất 3 ký tự')

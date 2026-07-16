@@ -81,10 +81,7 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
               <Skeleton className="h-20 w-full" />
             </div>
           ) : reviewsQuery.isError ? (
-            <ErrorState
-              message="Không thể tải đánh giá"
-              onRetry={() => reviewsQuery.refetch()}
-            />
+            <ErrorState message="Không thể tải đánh giá" onRetry={() => reviewsQuery.refetch()} />
           ) : (
             <ReviewList reviews={reviewsQuery.data ?? []} />
           )}

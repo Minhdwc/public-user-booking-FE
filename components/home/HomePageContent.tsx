@@ -48,7 +48,10 @@ export function HomePageContent() {
             Khám phá cụm sân, xem giá và thông tin chi tiết trước khi đặt lịch.
           </p>
 
-          <form onSubmit={handleSearch} className="mx-auto flex max-w-xl flex-col gap-3 sm:flex-row">
+          <form
+            onSubmit={handleSearch}
+            className="mx-auto flex max-w-xl flex-col gap-3 sm:flex-row"
+          >
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input

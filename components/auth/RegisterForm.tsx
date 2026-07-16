@@ -55,7 +55,10 @@ export function RegisterForm() {
           setError('email', { message });
           return;
         }
-        if (message.toLowerCase().includes('điện thoại') || message.toLowerCase().includes('phone')) {
+        if (
+          message.toLowerCase().includes('điện thoại') ||
+          message.toLowerCase().includes('phone')
+        ) {
           setError('phone', { message });
           return;
         }
@@ -89,18 +92,33 @@ export function RegisterForm() {
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" autoComplete="email" {...register('email')} />
-            {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
+            {errors.email ? (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Số điện thoại</Label>
-            <Input id="phone" type="tel" autoComplete="tel" placeholder="0901234567" {...register('phone')} />
-            {errors.phone ? <p className="text-sm text-destructive">{errors.phone.message}</p> : null}
+            <Input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder="0901234567"
+              {...register('phone')}
+            />
+            {errors.phone ? (
+              <p className="text-sm text-destructive">{errors.phone.message}</p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Mật khẩu</Label>
-            <Input id="password" type="password" autoComplete="new-password" {...register('password')} />
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              {...register('password')}
+            />
             {errors.password ? (
               <p className="text-sm text-destructive">{errors.password.message}</p>
             ) : null}

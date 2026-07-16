@@ -70,9 +70,7 @@ export function VenuesPageContent() {
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold sm:text-3xl">Tìm sân</h1>
-        <p className="text-muted-foreground">
-          Tìm theo tên cụm sân, địa điểm hoặc tên sân con
-        </p>
+        <p className="text-muted-foreground">Tìm theo tên cụm sân, địa điểm hoặc tên sân con</p>
       </div>
 
       <form key={search} onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row">
@@ -154,7 +152,9 @@ export function VenuesPageContent() {
           <Pagination
             page={page}
             hasNext={hasNext}
-            onPageChange={(nextPage) => updateParams({ page: nextPage > 1 ? String(nextPage) : null })}
+            onPageChange={(nextPage) =>
+              updateParams({ page: nextPage > 1 ? String(nextPage) : null })
+            }
           />
         </>
       ) : null}

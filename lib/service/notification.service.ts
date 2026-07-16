@@ -8,12 +8,9 @@ export const notificationService = {
       params,
     }) as Promise<PaginatedResult<INotification> | INotification[]>,
 
-  getUnreadCount: () =>
-    apiClient.get('/notifications/unread-count') as Promise<{ count: number }>,
+  getUnreadCount: () => apiClient.get('/notifications/unread-count') as Promise<{ count: number }>,
 
-  markRead: (id: string) =>
-    apiClient.patch(`/notifications/${id}/read`) as Promise<INotification>,
+  markRead: (id: string) => apiClient.patch(`/notifications/${id}/read`) as Promise<INotification>,
 
-  markAllRead: () =>
-    apiClient.patch('/notifications/read-all') as Promise<{ success: boolean }>,
+  markAllRead: () => apiClient.patch('/notifications/read-all') as Promise<{ success: boolean }>,
 };

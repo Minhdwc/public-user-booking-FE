@@ -14,10 +14,7 @@ import { ApiError } from '@/lib/api/errors';
 import { getFieldAvailability } from '@/lib/api/fields';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import type { ITimeslot } from '@/lib/types';
-import {
-  buildFieldBookingReturnPath,
-  buildLoginUrl,
-} from '@/lib/utils/auth-action';
+import { buildFieldBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
 interface BookingPanelProps {

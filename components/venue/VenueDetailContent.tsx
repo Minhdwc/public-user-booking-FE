@@ -79,7 +79,10 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
             {data.fields
               .filter((field) => field.sport)
               .map((field) => (
-                <FieldCard key={field.id} field={field as typeof field & { sport: NonNullable<typeof field.sport> }} />
+                <FieldCard
+                  key={field.id}
+                  field={field as typeof field & { sport: NonNullable<typeof field.sport> }}
+                />
               ))}
           </div>
         )}

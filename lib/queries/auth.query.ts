@@ -86,6 +86,11 @@ export const useChangePassword = () =>
 
 export const useUploadFile = () =>
   useMutation({
-    mutationFn: ({ file, folder }: { file: File; folder?: Parameters<typeof uploadService.upload>[1] }) =>
-      uploadService.upload(file, folder),
+    mutationFn: ({
+      file,
+      folder,
+    }: {
+      file: File;
+      folder?: Parameters<typeof uploadService.upload>[1];
+    }) => uploadService.upload(file, folder),
   });

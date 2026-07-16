@@ -8,8 +8,7 @@ export const reviewService = {
 
   getReview: (id: string) => apiClient.get(`/reviews/${id}`) as Promise<IReview>,
 
-  createReview: (body: CreateReviewPayload) =>
-    apiClient.post('/reviews', body) as Promise<IReview>,
+  createReview: (body: CreateReviewPayload) => apiClient.post('/reviews', body) as Promise<IReview>,
 
   updateReview: (id: string, body: { rating?: number; comment?: string | null }) =>
     apiClient.patch(`/reviews/${id}`, body) as Promise<IReview>,

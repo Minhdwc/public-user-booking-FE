@@ -54,7 +54,9 @@ export function LoginForm() {
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" autoComplete="email" {...register('email')} />
-            {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
+            {errors.email ? (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            ) : null}
           </div>
 
           <div className="space-y-2">

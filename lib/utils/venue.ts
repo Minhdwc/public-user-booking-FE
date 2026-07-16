@@ -1,6 +1,4 @@
-export function getVenueSports(
-  fields: { sport?: { id: string; name: string } | null }[] = [],
-) {
+export function getVenueSports(fields: { sport?: { id: string; name: string } | null }[] = []) {
   const map = new Map<string, string>();
   for (const field of fields) {
     if (!field.sport) continue;
