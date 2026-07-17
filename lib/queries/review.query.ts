@@ -35,9 +35,11 @@ export const useCreateReview = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: CreateReviewPayload) => reviewService.createReview(body),
-    onSuccess: (review) => {
+    onSuccess: (review, variables) => {
+      const fieldId = review?.fieldId ?? variables.fieldId;
       queryClient.invalidateQueries({ queryKey: reviewKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.byField(review.fieldId) });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.byField(fieldId) });
+      queryClient.invalidateQueries({ queryKey: ['reviews', 'field', fieldId] });
     },
   });
 };

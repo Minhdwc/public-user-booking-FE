@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { BookingPanel } from '@/components/field/BookingPanel';
 import { FieldInfo } from '@/components/field/FieldInfo';
 import { ReviewList } from '@/components/review/ReviewList';
+import { WriteReviewDialog } from '@/components/review/WriteReviewDialog';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -70,8 +71,9 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle>Đánh giá từ người chơi</CardTitle>
+          <WriteReviewDialog fieldId={fieldId} />
         </CardHeader>
         <CardContent>
           {reviewsQuery.isLoading ? (
