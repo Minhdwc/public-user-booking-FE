@@ -7,6 +7,10 @@ export async function createPayment(body: CreatePaymentPayload): Promise<IPaymen
   return paymentService.createPayment(body);
 }
 
+export async function getOrCreatePendingPayment(bookingId: string): Promise<IPayment> {
+  return paymentService.getOrCreatePendingPayment(bookingId);
+}
+
 export async function createVnpayUrl(paymentId: string): Promise<{ paymentUrl: string }> {
   return paymentService.createVnpayUrl(paymentId);
 }

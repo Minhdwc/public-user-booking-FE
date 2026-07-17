@@ -2,14 +2,17 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cancelBooking, listMyBookings } from '@/lib/api/bookings';
+import { createVnpayUrl, getOrCreatePendingPayment } from '@/lib/api/payments';
 import { ApiError } from '@/lib/api/errors';
-import type { IBookingWithRelations } from '@/lib/types';
+import { useCountdown } from '@/lib/hooks/useCountdown';
+import { IBookingWithRelations } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 function formatSlotTime(value: string) {
@@ -28,7 +31,7 @@ function formatBookingDate(value: string) {
 function statusLabel(status: string) {
   switch (status) {
     case 'pending':
-      return 'Chờ xác nhận';
+      return 'Đang giữ chỗ';
     case 'confirmed':
       return 'Đã xác nhận';
     case 'cancelled':
@@ -59,12 +62,78 @@ function canCancel(booking: IBookingWithRelations) {
   return booking.status === 'pending' || booking.status === 'confirmed';
 }
 
+function isHoldActive(booking: IBookingWithRelations) {
+  if (booking.status !== 'pending' || !booking.expiresAt) return false;
+  return new Date(booking.expiresAt).getTime() > Date.now();
+}
+
+function PendingBookingActions({
+  booking,
+  onCancel,
+  cancelPending,
+}: {
+  booking: IBookingWithRelations;
+  onCancel: () => void;
+  cancelPending: boolean;
+}) {
+  const { formatted, isExpired } = useCountdown(booking.expiresAt);
+  const didRefetch = useRef(false);
+  const queryClient = useQueryClient();
+  const [paying, setPaying] = useState(false);
+
+  useEffect(() => {
+    if (!isExpired || didRefetch.current) return;
+    didRefetch.current = true;
+    void queryClient.invalidateQueries({ queryKey: ['bookings'] });
+  }, [isExpired, queryClient]);
+
+  const continuePay = async () => {
+    setPaying(true);
+    try {
+      const payment = await getOrCreatePendingPayment(booking.id);
+      const { paymentUrl } = await createVnpayUrl(payment.id);
+      toast.message('Đang chuyển đến VNPay...');
+      window.location.href = paymentUrl;
+    } catch (error) {
+      setPaying(false);
+      const message = error instanceof ApiError ? error.message : 'Không thể tiếp tục thanh toán';
+      toast.error(message);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 sm:items-end">
+      {!isExpired ? (
+        <p className="text-sm font-medium text-amber-800">Còn {formatted} để thanh toán</p>
+      ) : (
+        <p className="text-sm text-muted-foreground">Đang đồng bộ trạng thái hết hạn...</p>
+      )}
+      <div className="flex gap-2">
+        <Button asChild variant="outline">
+          <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
+        </Button>
+        {!isExpired ? (
+          <Button disabled={paying} onClick={() => void continuePay()}>
+            {paying ? 'Đang chuyển...' : 'Tiếp tục thanh toán'}
+          </Button>
+        ) : null}
+        {canCancel(booking) ? (
+          <Button variant="destructive" disabled={cancelPending} onClick={onCancel}>
+            Hủy lịch
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function BookingsPageContent() {
   const queryClient = useQueryClient();
 
   const bookingsQuery = useQuery({
     queryKey: ['bookings', 'mine'],
     queryFn: listMyBookings,
+    refetchInterval: 20_000,
   });
 
   const cancelMutation = useMutation({
@@ -107,7 +176,9 @@ export function BookingsPageContent() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Lịch đặt sân của tôi</h1>
-        <p className="text-muted-foreground">Theo dõi và hủy các lịch đặt sân của bạn</p>
+        <p className="text-muted-foreground">
+          Theo dõi giữ chỗ, thanh toán và hủy các lịch đặt sân của bạn
+        </p>
       </div>
 
       {bookings.length === 0 ? (
@@ -165,20 +236,29 @@ export function BookingsPageContent() {
                   </p>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button asChild variant="outline">
-                    <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
-                  </Button>
-                  {canCancel(booking) ? (
-                    <Button
-                      variant="destructive"
-                      disabled={cancelMutation.isPending}
-                      onClick={() => cancelMutation.mutate(booking.id)}
-                    >
-                      Hủy lịch
+                {isHoldActive(booking) ||
+                (booking.status === 'pending' && booking.expiresAt) ? (
+                  <PendingBookingActions
+                    booking={booking}
+                    cancelPending={cancelMutation.isPending}
+                    onCancel={() => cancelMutation.mutate(booking.id)}
+                  />
+                ) : (
+                  <div className="flex gap-2">
+                    <Button asChild variant="outline">
+                      <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
                     </Button>
-                  ) : null}
-                </div>
+                    {canCancel(booking) ? (
+                      <Button
+                        variant="destructive"
+                        disabled={cancelMutation.isPending}
+                        onClick={() => cancelMutation.mutate(booking.id)}
+                      >
+                        Hủy lịch
+                      </Button>
+                    ) : null}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

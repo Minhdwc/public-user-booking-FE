@@ -10,10 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createBooking } from '@/lib/api/bookings';
+import { createVnpayUrl, getOrCreatePendingPayment } from '@/lib/api/payments';
 import { ApiError } from '@/lib/api/errors';
 import { getFieldAvailability } from '@/lib/api/fields';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import type { ITimeslot } from '@/lib/types';
+import { ITimeslot } from '@/lib/types';
 import { buildFieldBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,8 @@ interface BookingPanelProps {
   fieldName: string;
   price: number;
 }
+
+type SubmitPhase = 'idle' | 'holding' | 'redirecting';
 
 function todayLocalIsoDate() {
   const now = new Date();
@@ -50,6 +53,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
 
   const [date, setDate] = useState(draftDate || todayLocalIsoDate);
   const [selectedTimeslotId, setSelectedTimeslotId] = useState<string | null>(draftTimeslotId);
+  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
 
   useEffect(() => {
     if (draftDate) setDate(draftDate);
@@ -63,17 +67,35 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   });
 
   const createMutation = useMutation({
-    mutationFn: createBooking,
-    onSuccess: async () => {
-      toast.success('Đặt sân thành công');
-      setSelectedTimeslotId(null);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['fields', fieldId, 'availability'] }),
-        queryClient.invalidateQueries({ queryKey: ['bookings'] }),
-      ]);
-      router.push('/bookings');
+    mutationFn: async (payload: { fieldId: string; timeslotId: string; date: string }) => {
+      setSubmitPhase('holding');
+      const booking = await createBooking(payload);
+
+      try {
+        setSubmitPhase('redirecting');
+        const payment = await getOrCreatePendingPayment(booking.id);
+        const { paymentUrl } = await createVnpayUrl(payment.id);
+        return { ok: true as const, paymentUrl };
+      } catch {
+        toast.error('Đã giữ chỗ nhưng chưa thanh toán được, vào Lịch đặt sân để thử lại');
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['fields', fieldId, 'availability'] }),
+          queryClient.invalidateQueries({ queryKey: ['bookings'] }),
+        ]);
+        router.push('/bookings');
+        return { ok: false as const };
+      }
+    },
+    onSuccess: (result) => {
+      if (!result.ok) {
+        setSubmitPhase('idle');
+        return;
+      }
+      toast.message('Đang chuyển đến VNPay...');
+      window.location.href = result.paymentUrl;
     },
     onError: (error) => {
+      setSubmitPhase('idle');
       const message = error instanceof ApiError ? error.message : 'Không thể đặt sân';
       toast.error(message);
     },
@@ -105,7 +127,6 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
       return;
     }
 
-    // Browse freely — only require auth when placing the booking
     if (!isAuthenticated) {
       toast.message('Đăng nhập để tiếp tục đặt sân');
       goLoginToContinue();
@@ -119,12 +140,20 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
     });
   };
 
+  const buttonLabel = (() => {
+    if (!isHydrated) return 'Đang tải...';
+    if (submitPhase === 'holding') return 'Đang giữ chỗ...';
+    if (submitPhase === 'redirecting' || createMutation.isPending) return 'Đang chuyển đến VNPay...';
+    if (!isAuthenticated) return 'Đăng nhập để đặt sân';
+    return 'Đặt sân';
+  })();
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Đặt sân</CardTitle>
         <CardDescription>
-          Chọn ngày và khung giờ cho {fieldName}.
+          Chọn ngày và khung giờ cho {fieldName}. Sau khi đặt, bạn có 15 phút để thanh toán.
           {!isAuthenticated && isHydrated
             ? ' Bạn xem lịch tự do — đăng nhập khi sẵn sàng đặt.'
             : null}
@@ -204,13 +233,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
           disabled={createMutation.isPending || availabilityQuery.isLoading || !isHydrated}
           onClick={handleSubmit}
         >
-          {!isHydrated
-            ? 'Đang tải...'
-            : createMutation.isPending
-              ? 'Đang đặt...'
-              : !isAuthenticated
-                ? 'Đăng nhập để đặt sân'
-                : 'Đặt sân'}
+          {buttonLabel}
         </Button>
       </CardContent>
     </Card>

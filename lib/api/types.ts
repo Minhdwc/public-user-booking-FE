@@ -123,6 +123,7 @@ export interface IBooking {
   status: BookingStatus;
   amount: number;
   slotLock?: string;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
   user?: Pick<IUser, 'id' | 'name' | 'email' | 'phone'>;

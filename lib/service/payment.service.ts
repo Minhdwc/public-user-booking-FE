@@ -11,6 +11,9 @@ export const paymentService = {
   createPayment: (body: CreatePaymentPayload) =>
     apiClient.post('/payments', body) as Promise<IPayment>,
 
+  getOrCreatePendingPayment: (bookingId: string) =>
+    apiClient.post(`/payments/pending-for-booking/${bookingId}`) as Promise<IPayment>,
+
   createVnpayUrl: (paymentId: string) =>
     apiClient.post(`/payments/${paymentId}/vnpay-url`) as Promise<{ paymentUrl: string }>,
 };
