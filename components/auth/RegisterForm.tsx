@@ -68,9 +68,9 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-2xl border-border/70 shadow-md">
       <CardHeader className="text-center">
-        <CardTitle>Đăng ký</CardTitle>
+        <CardTitle className="text-heading">Đăng ký</CardTitle>
         <CardDescription>Tạo tài khoản để bắt đầu đặt sân</CardDescription>
       </CardHeader>
       <CardContent>
@@ -139,7 +139,7 @@ export function RegisterForm() {
 
           {errors.root ? <p className="text-sm text-destructive">{errors.root.message}</p> : null}
 
-          <Button type="submit" className="w-full" disabled={isRegistering}>
+          <Button type="submit" className="w-full rounded-full shadow-sm" disabled={isRegistering}>
             {isRegistering ? 'Đang đăng ký...' : 'Đăng ký'}
           </Button>
 

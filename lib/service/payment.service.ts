@@ -16,4 +16,14 @@ export const paymentService = {
 
   createVnpayUrl: (paymentId: string) =>
     apiClient.post(`/payments/${paymentId}/vnpay-url`) as Promise<{ paymentUrl: string }>,
+
+  payWithSavedMethod: (paymentId: string, userPaymentMethodId?: string) =>
+    apiClient.post(`/payments/${paymentId}/pay-with-saved-method`, {
+      ...(userPaymentMethodId ? { userPaymentMethodId } : {}),
+    }) as Promise<{
+      paymentId: string;
+      status: string;
+      method: string;
+      transactionCode: string;
+    }>,
 };

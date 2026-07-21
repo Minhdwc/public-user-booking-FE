@@ -2,8 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ChangePasswordForm } from '@/components/account/ChangePasswordForm';
+import { PaymentMethodsSection } from '@/components/account/PaymentMethodsSection';
 import { ProfileForm } from '@/components/account/ProfileForm';
 import { ErrorState } from '@/components/common/ErrorState';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMe, type AccountMe } from '@/lib/api/account';
@@ -40,12 +42,13 @@ export function AccountPageContent() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">Tài khoản</h1>
-        <p className="text-muted-foreground">Quản lý hồ sơ và bảo mật tài khoản của bạn</p>
-      </div>
+      <PageHeader
+        eyebrow="Cá nhân"
+        title="Tài khoản"
+        description="Quản lý hồ sơ, bảo mật và phương thức thanh toán của bạn."
+      />
 
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle>Hồ sơ</CardTitle>
           <CardDescription>Cập nhật thông tin cá nhân và ảnh đại diện</CardDescription>
@@ -55,7 +58,7 @@ export function AccountPageContent() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle>Đổi mật khẩu</CardTitle>
           <CardDescription>Đảm bảo mật khẩu mạnh và khác mật khẩu cũ</CardDescription>
@@ -64,6 +67,8 @@ export function AccountPageContent() {
           <ChangePasswordForm />
         </CardContent>
       </Card>
+
+      <PaymentMethodsSection />
     </div>
   );
 }

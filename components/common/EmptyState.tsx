@@ -20,7 +20,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed p-10 text-center',
+        'flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/70 bg-muted/30 p-10 text-center',
         className,
       )}
     >
@@ -28,11 +28,11 @@ export function EmptyState({
         <Inbox className="h-6 w-6 text-muted-foreground" />
       </div>
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold text-heading">{title}</h3>
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
       </div>
       {actionLabel && onAction ? (
-        <Button variant="outline" onClick={onAction}>
+        <Button variant="outline" className="rounded-full" onClick={onAction}>
           {actionLabel}
         </Button>
       ) : null}

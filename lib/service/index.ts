@@ -7,6 +7,7 @@ export { bookingService } from './booking.service';
 export { paymentService } from './payment.service';
 export { paymentMethodService } from './payment-method.service';
 export { reviewService } from './review.service';
+export { userPaymentMethodService } from './user-payment-method.service';
 export { amenityService } from './amenity.service';
 export { notificationService } from './notification.service';
 export { timeslotService } from './timeslot.service';

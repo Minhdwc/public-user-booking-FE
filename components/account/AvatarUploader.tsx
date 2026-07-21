@@ -51,7 +51,7 @@ export function AvatarUploader({ value, onChange, disabled }: AvatarUploaderProp
     <div className="flex items-center gap-4">
       <div
         className={cn(
-          'flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border bg-muted',
+          'flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-primary/20 bg-muted ring-2 ring-primary/5',
         )}
       >
         {value ? (
@@ -75,6 +75,7 @@ export function AvatarUploader({ value, onChange, disabled }: AvatarUploaderProp
           type="button"
           variant="outline"
           size="sm"
+          className="rounded-full"
           disabled={disabled || isUploading}
           onClick={() => inputRef.current?.click()}
         >

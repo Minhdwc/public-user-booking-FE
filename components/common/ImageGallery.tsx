@@ -16,7 +16,7 @@ export function ImageGallery({ images, alt, className }: ImageGalleryProps) {
   const hasImages = images.length > 0;
 
   if (!hasImages) {
-    return <ImagePlaceholder className={cn('aspect-video w-full rounded-xl', className)} />;
+    return <ImagePlaceholder className={cn('aspect-video w-full rounded-2xl', className)} />;
   }
 
   return (
@@ -28,7 +28,7 @@ export function ImageGallery({ images, alt, className }: ImageGalleryProps) {
             type="button"
             onClick={() => setActiveIndex(index)}
             className={cn(
-              'overflow-hidden rounded-xl border bg-muted',
+              'group overflow-hidden rounded-2xl border border-border/70 bg-muted shadow-sm transition-shadow hover:shadow-md',
               index === 0 && images.length > 1 ? 'sm:col-span-2 sm:row-span-2' : '',
             )}
           >
@@ -36,7 +36,7 @@ export function ImageGallery({ images, alt, className }: ImageGalleryProps) {
             <img
               src={image}
               alt={`${alt} ${index + 1}`}
-              className="aspect-video h-full w-full object-cover transition-transform hover:scale-105"
+              className="aspect-video h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </button>
         ))}
@@ -52,7 +52,7 @@ export function ImageGallery({ images, alt, className }: ImageGalleryProps) {
             <img
               src={images[activeIndex]}
               alt={`${alt} ${activeIndex + 1}`}
-              className="max-h-[70vh] w-full rounded-lg object-contain"
+              className="max-h-[70vh] w-full rounded-xl object-contain"
             />
           ) : null}
         </DialogContent>

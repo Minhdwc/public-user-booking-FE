@@ -1,16 +1,15 @@
 'use client';
 
-import { FormEvent, useMemo } from 'react';
+import { useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Pagination } from '@/components/common/Pagination';
+import { SearchBar } from '@/components/common/SearchBar';
 import { SportFilterChips } from '@/components/common/SportFilterChips';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { VenueCard } from '@/components/venue/VenueCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getSports } from '@/lib/api/sports';
 import { getVenues } from '@/lib/api/venues';
@@ -56,58 +55,42 @@ export function VenuesPageContent() {
 
   const hasNext = (venuesQuery.data?.length ?? 0) === PAGE_SIZE;
 
-  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const query = String(formData.get('search') ?? '').trim();
-    updateParams({
-      search: query || null,
-      page: null,
-    });
-  };
-
   return (
     <div className="space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold sm:text-3xl">Tìm sân</h1>
-        <p className="text-muted-foreground">Tìm theo tên cụm sân, địa điểm hoặc tên sân con</p>
-      </div>
-
-      <form key={search} onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            name="search"
-            defaultValue={search}
-            placeholder="Nhập từ khóa tìm kiếm..."
-            className="pl-10"
-          />
-        </div>
-        <Button type="submit">Tìm kiếm</Button>
-      </form>
-
-      <SportFilterChips
-        sports={sportsQuery.data ?? []}
-        selectedSportId={sportId}
-        isLoading={sportsQuery.isLoading}
-        onSelect={(id) =>
-          updateParams({
-            sport: id,
-            page: null,
-          })
-        }
+      <PageHeader
+        eyebrow="Khám phá"
+        title="Cơ sở thể thao"
+        description="Tìm theo tên cơ sở, địa điểm hoặc môn thể thao bạn muốn chơi."
       />
 
-      {sportId ? (
-        <p className="text-sm text-muted-foreground">
-          Đang lọc theo môn thể thao trên trang hiện tại (client-side, tạm thời).
-        </p>
-      ) : null}
+      <div className="surface-card space-y-5 p-5 sm:p-6">
+        <SearchBar
+          defaultValue={search}
+          placeholder="Nhập từ khóa tìm kiếm..."
+          onSubmit={(query) =>
+            updateParams({
+              search: query || null,
+              page: null,
+            })
+          }
+        />
+        <SportFilterChips
+          sports={sportsQuery.data ?? []}
+          selectedSportId={sportId}
+          isLoading={sportsQuery.isLoading}
+          onSelect={(id) =>
+            updateParams({
+              sport: id,
+              page: null,
+            })
+          }
+        />
+      </div>
 
       {venuesQuery.isLoading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: PAGE_SIZE }).map((_, index) => (
-            <Skeleton key={index} className="aspect-[4/3] w-full rounded-xl" />
+            <Skeleton key={index} className="aspect-[4/3] w-full rounded-2xl" />
           ))}
         </div>
       ) : null}
@@ -117,7 +100,7 @@ export function VenuesPageContent() {
           message={
             venuesQuery.error instanceof Error
               ? venuesQuery.error.message
-              : 'Không thể tải danh sách cụm sân'
+              : 'Không thể tải danh sách cơ sở'
           }
           onRetry={() => venuesQuery.refetch()}
         />
@@ -125,20 +108,14 @@ export function VenuesPageContent() {
 
       {!venuesQuery.isLoading && !venuesQuery.isError && filteredVenues.length === 0 ? (
         <EmptyState
-          title="Không tìm thấy cụm sân"
+          title="Không tìm thấy cơ sở"
           description={
             search || sportId
               ? 'Thử đổi từ khóa hoặc bộ lọc môn thể thao.'
-              : 'Hiện chưa có cụm sân nào trong hệ thống.'
+              : 'Hiện chưa có cơ sở nào trong hệ thống.'
           }
           actionLabel={search || sportId ? 'Xóa bộ lọc' : undefined}
-          onAction={
-            search || sportId
-              ? () => {
-                  router.push('/venues');
-                }
-              : undefined
-          }
+          onAction={search || sportId ? () => router.push('/venues') : undefined}
         />
       ) : null}
 

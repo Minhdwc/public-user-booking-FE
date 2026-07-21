@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -27,6 +27,7 @@ function formatBookingDate(value: string) {
 
 export function PaymentsResultContent() {
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const status = searchParams.get('status') ?? '';
   const paymentId = searchParams.get('paymentId');
   const [retrying, setRetrying] = useState(false);
@@ -43,6 +44,7 @@ export function PaymentsResultContent() {
     toastedRef.current = true;
 
     if (status === 'success') {
+      void queryClient.invalidateQueries({ queryKey: ['bookings'] });
       toast.success('Đặt sân thành công', {
         description: 'Thanh toán đã được xác nhận. Lịch đặt của bạn đã sẵn sàng.',
       });
@@ -61,7 +63,7 @@ export function PaymentsResultContent() {
         description: 'Vui lòng liên hệ hỗ trợ nếu tiền đã bị trừ.',
       });
     }
-  }, [status]);
+  }, [status, queryClient]);
 
   const retryMutation = useMutation({
     mutationFn: async () => {
@@ -87,9 +89,9 @@ export function PaymentsResultContent() {
     const booking = paymentQuery.data?.booking;
 
     return (
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle>Thanh toán thành công</CardTitle>
+          <CardTitle className="text-heading">Thanh toán thành công</CardTitle>
           <CardDescription>
             Đặt sân đã được xác nhận. Email xác nhận sẽ được gửi sau khi thanh toán thành công.
           </CardDescription>
@@ -137,9 +139,9 @@ export function PaymentsResultContent() {
 
   if (status === 'failed') {
     return (
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle>Thanh toán thất bại</CardTitle>
+          <CardTitle className="text-heading">Thanh toán thất bại</CardTitle>
           <CardDescription>
             Bạn có thể thử lại với cùng giao dịch đang chờ — không tạo thanh toán mới.
           </CardDescription>
@@ -167,9 +169,9 @@ export function PaymentsResultContent() {
           : 'Không tìm thấy thanh toán';
 
     return (
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-heading">{title}</CardTitle>
           <CardDescription>
             Có lỗi kỹ thuật khi xác nhận thanh toán. Vui lòng liên hệ hỗ trợ và cung cấp mã giao dịch
             nếu có.
@@ -185,9 +187,9 @@ export function PaymentsResultContent() {
   }
 
   return (
-    <Card>
+    <Card className="rounded-2xl border-border/70 shadow-sm">
       <CardHeader>
-        <CardTitle>Kết quả thanh toán</CardTitle>
+        <CardTitle className="text-heading">Kết quả thanh toán</CardTitle>
         <CardDescription>
           Không xác định được trạng thái từ URL. Kiểm tra lại lịch đặt sân.
         </CardDescription>

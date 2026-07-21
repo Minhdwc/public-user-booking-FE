@@ -11,6 +11,7 @@ export const reviewKeys = {
   lists: () => [...reviewKeys.all, 'list'] as const,
   list: (params: ListParams = {}) => [...reviewKeys.lists(), params] as const,
   byField: (fieldId: string) => [...reviewKeys.all, 'field', fieldId] as const,
+  eligibility: (fieldId: string) => [...reviewKeys.all, 'eligibility', fieldId] as const,
   details: () => [...reviewKeys.all, 'detail'] as const,
   detail: (id: string) => [...reviewKeys.details(), id] as const,
 };
@@ -40,6 +41,14 @@ export const useCreateReview = () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.lists() });
       queryClient.invalidateQueries({ queryKey: reviewKeys.byField(fieldId) });
       queryClient.invalidateQueries({ queryKey: ['reviews', 'field', fieldId] });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.eligibility(fieldId) });
     },
   });
 };
+
+export const useReviewEligibility = (fieldId: string, enabled = true) =>
+  useQuery({
+    queryKey: reviewKeys.eligibility(fieldId),
+    queryFn: () => reviewService.getReviewEligibility(fieldId),
+    enabled: Boolean(fieldId) && enabled,
+  });

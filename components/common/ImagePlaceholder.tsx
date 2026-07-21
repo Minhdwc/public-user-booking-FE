@@ -10,12 +10,14 @@ export function ImagePlaceholder({ className, label = 'Chưa có ảnh' }: Image
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-2 bg-muted text-muted-foreground',
+        'flex flex-col items-center justify-center gap-2 border border-dashed border-border/70 bg-muted/60 text-muted-foreground',
         className,
       )}
     >
-      <ImageIcon className="h-8 w-8 opacity-50" />
-      <span className="text-xs">{label}</span>
+      <div className="flex size-12 items-center justify-center rounded-full bg-background/80">
+        <ImageIcon className="size-5 opacity-60" />
+      </div>
+      <span className="text-xs font-medium">{label}</span>
     </div>
   );
 }

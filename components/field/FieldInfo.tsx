@@ -15,42 +15,42 @@ export function FieldInfo({ field }: FieldInfoProps) {
 
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-bold sm:text-3xl">{field.name}</h1>
-          {field.sport?.name && (
-            <span className="rounded-full bg-secondary px-3 py-1 text-sm font-medium">
+          <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-4xl">{field.name}</h1>
+          {field.sport?.name ? (
+            <span className="rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-secondary-foreground">
               {field.sport.name}
             </span>
-          )}
+          ) : null}
         </div>
 
-        <p className="text-2xl font-bold text-primary">
+        <p className="text-3xl font-bold text-primary">
           {formatPrice(field.price)}
           <span className="text-base font-normal text-muted-foreground"> / giờ</span>
         </p>
 
         {field.description ? (
-          <p className="text-muted-foreground">{field.description}</p>
+          <p className="leading-relaxed text-muted-foreground">{field.description}</p>
         ) : (
           <p className="text-sm text-muted-foreground">Chưa có mô tả cho sân này.</p>
         )}
 
-        {field.venue && (
-          <div className="rounded-xl border bg-muted/30 p-4">
-            <p className="text-sm font-medium text-muted-foreground">Cụm sân</p>
+        {field.venue ? (
+          <div className="surface-card p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cơ sở</p>
             <Link
               href={`/venues/${field.venue.id}`}
-              className="mt-1 inline-flex items-start gap-2 font-semibold hover:text-primary"
+              className="mt-2 inline-flex items-start gap-2 font-semibold text-heading hover:text-primary"
             >
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+              <MapPin className="mt-0.5 size-4 shrink-0" />
               <span>
                 {field.venue.name}
-                <span className="mt-0.5 block text-sm font-normal text-muted-foreground">
+                <span className="mt-1 block text-sm font-normal text-muted-foreground">
                   {field.venue.location}
                 </span>
               </span>
             </Link>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

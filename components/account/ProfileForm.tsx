@@ -119,7 +119,7 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={mutation.isPending || !isDirty}>
+      <Button type="submit" className="rounded-full shadow-sm" disabled={mutation.isPending || !isDirty}>
         {mutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
       </Button>
     </form>

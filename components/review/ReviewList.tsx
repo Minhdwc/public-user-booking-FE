@@ -21,23 +21,23 @@ export function ReviewList({ reviews }: ReviewListProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="surface-muted flex flex-wrap items-center gap-3 px-4 py-3">
         <RatingStars rating={average} showValue size="md" />
         <span className="text-sm text-muted-foreground">{reviews.length} đánh giá</span>
       </div>
 
-      <ul className="space-y-4">
+      <ul className="space-y-3">
         {reviews.map((review) => (
-          <li key={review.id} className="rounded-xl border p-4">
+          <li key={review.id} className="surface-card p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-medium">{review.user?.name ?? 'Người dùng'}</p>
+                <p className="font-medium text-heading">{review.user?.name ?? 'Người dùng'}</p>
                 <p className="text-xs text-muted-foreground">{formatDate(review.createdAt)}</p>
               </div>
               <RatingStars rating={review.rating} size="sm" />
             </div>
             {review.comment ? (
-              <p className="mt-3 text-sm text-muted-foreground">{review.comment}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{review.comment}</p>
             ) : (
               <p className="mt-3 text-sm italic text-muted-foreground">Không có nhận xét.</p>
             )}

@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
 import { MapPin } from 'lucide-react';
+import { BackLink } from '@/components/common/BackLink';
 import { ErrorState } from '@/components/common/ErrorState';
 import { FieldCard } from '@/components/field/FieldCard';
 import { VenueGallery } from '@/components/venue/VenueGallery';
@@ -23,8 +23,8 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="aspect-video w-full rounded-xl" />
-        <Skeleton className="h-40 w-full rounded-xl" />
+        <Skeleton className="aspect-video w-full rounded-2xl" />
+        <Skeleton className="h-40 w-full rounded-2xl" />
       </div>
     );
   }
@@ -32,8 +32,8 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
   if (isError || !data) {
     return (
       <ErrorState
-        title="Không tìm thấy cụm sân"
-        message={error instanceof Error ? error.message : 'Cụm sân không tồn tại hoặc đã bị ẩn'}
+        title="Không tìm thấy cơ sở"
+        message={error instanceof Error ? error.message : 'Cơ sở không tồn tại hoặc đã bị ẩn'}
         onRetry={() => refetch()}
       />
     );
@@ -42,13 +42,12 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
   return (
     <div className="space-y-10">
       <div className="space-y-4">
+        <BackLink href="/venues" label="Quay lại danh sách cơ sở" />
         <div>
-          <Link href="/venues" className="text-sm text-primary hover:underline">
-            ← Quay lại danh sách
-          </Link>
-          <h1 className="mt-2 text-2xl font-bold sm:text-3xl">{data.name}</h1>
-          <p className="mt-2 flex items-start gap-2 text-muted-foreground">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cơ sở</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-heading sm:text-4xl">{data.name}</h1>
+          <p className="mt-3 flex items-start gap-2 text-muted-foreground">
+            <MapPin className="mt-0.5 size-4 shrink-0" />
             {data.location}
           </p>
         </div>
@@ -56,33 +55,28 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
         <VenueGallery images={data.images ?? []} venueName={data.name} />
 
         {data.description ? (
-          <p className="text-muted-foreground">{data.description}</p>
+          <p className="max-w-3xl leading-relaxed text-muted-foreground">{data.description}</p>
         ) : (
-          <p className="text-sm text-muted-foreground">Chưa có mô tả cho cụm sân này.</p>
+          <p className="text-sm text-muted-foreground">Chưa có mô tả cho cơ sở này.</p>
         )}
       </div>
 
-      <section className="space-y-4">
+      <section className="space-y-5">
         <div>
-          <h2 className="text-xl font-semibold">Danh sách sân</h2>
-          <p className="text-sm text-muted-foreground">
-            {data.fields?.length ?? 0} sân đang hoạt động
-          </p>
+          <h2 className="text-xl font-bold text-heading">Danh sách sân</h2>
+          <p className="text-sm text-muted-foreground">{data.fields?.length ?? 0} sân đang hoạt động</p>
         </div>
 
         {!data.fields?.length ? (
-          <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
-            Cụm sân này chưa có sân active nào.
-          </p>
+          <div className="surface-muted px-6 py-12 text-center text-muted-foreground">
+            Cơ sở này chưa có sân active nào.
+          </div>
         ) : (
           <div className="space-y-4">
             {data.fields
               .filter((field) => field.sport)
               .map((field) => (
-                <FieldCard
-                  key={field.id}
-                  field={field as typeof field & { sport: NonNullable<typeof field.sport> }}
-                />
+                <FieldCard key={field.id} field={{ ...field, sport: field.sport! }} />
               ))}
           </div>
         )}

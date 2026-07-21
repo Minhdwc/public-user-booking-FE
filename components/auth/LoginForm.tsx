@@ -42,9 +42,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-2xl border-border/70 shadow-md">
       <CardHeader className="text-center">
-        <CardTitle>Đăng nhập</CardTitle>
+        <CardTitle className="text-heading">Đăng nhập</CardTitle>
         <CardDescription>
           Duyệt sân tự do — chỉ cần đăng nhập khi đặt sân hoặc quản lý tài khoản
         </CardDescription>
@@ -74,7 +74,7 @@ export function LoginForm() {
 
           {errors.root ? <p className="text-sm text-destructive">{errors.root.message}</p> : null}
 
-          <Button type="submit" className="w-full" disabled={isLoggingIn}>
+          <Button type="submit" className="w-full rounded-full shadow-sm" disabled={isLoggingIn}>
             {isLoggingIn ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </Button>
 

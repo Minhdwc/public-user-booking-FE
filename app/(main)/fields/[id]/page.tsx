@@ -1,3 +1,4 @@
+import { PageShell } from '@/components/layout/PageShell';
 import { FieldDetailContent } from '@/components/field/FieldDetailContent';
 
 interface FieldDetailPageProps {
@@ -8,8 +9,8 @@ export default async function FieldDetailPage({ params }: FieldDetailPageProps) 
   const { id } = await params;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <PageShell>
       <FieldDetailContent fieldId={id} />
-    </div>
+    </PageShell>
   );
 }

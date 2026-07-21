@@ -185,6 +185,50 @@ export interface CreateReviewPayload {
   comment?: string;
 }
 
+export type ReviewEligibilityReason = 'no_confirmed_booking' | 'already_reviewed';
+
+export interface ReviewEligibility {
+  canReview: boolean;
+  reason: ReviewEligibilityReason | null;
+  message: string | null;
+}
+
+export type UserPaymentMethodType = 'bank_transfer' | 'momo' | 'zalopay' | 'vnpay';
+
+export interface IUserPaymentMethod {
+  id: string;
+  userId: string;
+  type: UserPaymentMethodType;
+  provider: string;
+  providerToken?: string | null;
+  maskedNumber?: string | null;
+  holderName?: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateUserPaymentMethodPayload {
+  type: UserPaymentMethodType;
+  provider: string;
+  providerToken?: string;
+  maskedNumber?: string;
+  holderName?: string;
+  isDefault?: boolean;
+  isActive?: boolean;
+}
+
+export interface UpdateUserPaymentMethodPayload {
+  type?: UserPaymentMethodType;
+  provider?: string;
+  providerToken?: string | null;
+  maskedNumber?: string | null;
+  holderName?: string | null;
+  isDefault?: boolean;
+  isActive?: boolean;
+}
+
 export interface ListParams {
   search?: string;
   page?: number | string;
@@ -197,6 +241,8 @@ export interface FieldListParams extends ListParams {
   venueId?: string;
   sportId?: string;
   status?: FieldStatus;
+  minPrice?: number | string;
+  maxPrice?: number | string;
 }
 
 /** @deprecated Use PaymentTxnMethod */

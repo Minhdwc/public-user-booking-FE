@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
+import { BackLink } from '@/components/common/BackLink';
 import { BookingPanel } from '@/components/field/BookingPanel';
 import { FieldInfo } from '@/components/field/FieldInfo';
 import { ReviewList } from '@/components/review/ReviewList';
@@ -54,25 +54,25 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
 
   return (
     <div className="space-y-10">
-      <Link
-        href={fieldQuery.data.venue ? `/venues/${fieldQuery.data.venue.id}` : '/venues'}
-        className="text-sm text-primary hover:underline"
-      >
-        ← Quay lại {fieldQuery.data.venue?.name ?? 'danh sách sân'}
-      </Link>
+      <BackLink
+        href={fieldQuery.data.venue ? `/venues/${fieldQuery.data.venue.id}` : '/fields'}
+        label={`Quay lại ${fieldQuery.data.venue?.name ?? 'danh sách sân'}`}
+      />
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <FieldInfo field={fieldQuery.data} />
-        <BookingPanel
-          fieldId={fieldQuery.data.id}
-          fieldName={fieldQuery.data.name}
-          price={fieldQuery.data.price}
-        />
+        <div className="lg:sticky lg:top-24">
+          <BookingPanel
+            fieldId={fieldQuery.data.id}
+            fieldName={fieldQuery.data.name}
+            price={fieldQuery.data.price}
+          />
+        </div>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl border-border/70 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-          <CardTitle>Đánh giá từ người chơi</CardTitle>
+          <CardTitle className="text-heading">Đánh giá từ người chơi</CardTitle>
           <WriteReviewDialog fieldId={fieldId} />
         </CardHeader>
         <CardContent>

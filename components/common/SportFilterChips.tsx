@@ -36,10 +36,10 @@ export function SportFilterChips({
         type="button"
         onClick={() => onSelect(null)}
         className={cn(
-          'rounded-full border px-4 py-2 text-sm font-medium transition-colors',
+          'rounded-full border px-4 py-2 text-sm font-medium transition-all',
           !selectedSportId
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'bg-background hover:bg-accent',
+            ? 'chip-active'
+            : 'border-border/70 bg-card text-muted-foreground hover:border-primary/30 hover:bg-accent',
         )}
       >
         Tất cả
@@ -50,10 +50,10 @@ export function SportFilterChips({
           type="button"
           onClick={() => onSelect(sport.id)}
           className={cn(
-            'rounded-full border px-4 py-2 text-sm font-medium transition-colors',
-            selectedSportId === sport.id
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'bg-background hover:bg-accent',
+          'rounded-full border px-4 py-2 text-sm font-medium transition-all',
+          selectedSportId === sport.id
+            ? 'chip-active'
+            : 'border-border/70 bg-card text-muted-foreground hover:border-primary/30 hover:bg-accent',
           )}
         >
           {sport.name}

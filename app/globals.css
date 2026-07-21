@@ -32,49 +32,62 @@
 
 :root {
   color-scheme: light;
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
 }
 
 html.dark {
   color-scheme: dark;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-border/70 bg-card shadow-sm;
+  }
+
+  .surface-muted {
+    @apply rounded-2xl border border-border/60 bg-muted/50;
+  }
+
+  .hero-gradient {
+    background:
+      radial-gradient(circle at 20% 20%, rgb(149 246 138 / 0.35), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgb(0 221 225 / 0.12), transparent 40%),
+      linear-gradient(180deg, #ecf7e5 0%, #f1fdea 55%, #ffffff 100%);
+  }
+
+  html.dark .hero-gradient {
+    background:
+      radial-gradient(circle at 20% 20%, rgb(149 246 138 / 0.08), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgb(0 221 225 / 0.05), transparent 40%),
+      linear-gradient(180deg, #0c140c 0%, #121c12 55%, #162016 100%);
+  }
+
+  .nav-pill-active {
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+
+  .chip-active {
+    @apply border-primary bg-primary text-primary-foreground shadow-sm;
+  }
+
+  .status-badge {
+    @apply rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200;
+  }
+
+  .status-confirmed {
+    @apply bg-emerald-100 text-emerald-900 dark:bg-primary/20 dark:text-secondary;
+  }
+
+  .status-cancelled {
+    @apply bg-slate-100 text-slate-700 dark:bg-muted dark:text-muted-foreground;
+  }
+
+  .status-completed {
+    @apply bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-200;
+  }
 }
 
 @layer base {

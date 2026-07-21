@@ -1,0 +1,50 @@
+@theme inline {
+  --color-heading: var(--foreground);
+  --color-surface: var(--card);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #f1fdea;
+  --foreground: #141e13;
+  --card: #ffffff;
+  --card-foreground: #141e13;
+  --popover: #ffffff;
+  --popover-foreground: #141e13;
+  --primary: #006e14;
+  --primary-foreground: #ffffff;
+  --secondary: #95f68a;
+  --secondary-foreground: #006111;
+  --muted: #ecf7e5;
+  --muted-foreground: #3c4b38;
+  --accent: #e0ecda;
+  --accent-foreground: #141e13;
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+  --border: #bacbb3;
+  --input: #bacbb3;
+  --ring: #006e14;
+}
+
+html.dark {
+  color-scheme: dark;
+  --background: #0c140c;
+  --foreground: #ecf7e5;
+  --card: #162016;
+  --card-foreground: #ecf7e5;
+  --popover: #162016;
+  --popover-foreground: #ecf7e5;
+  --primary: #95f68a;
+  --primary-foreground: #0c140c;
+  --secondary: #1e2e1e;
+  --secondary-foreground: #95f68a;
+  --muted: #1a281a;
+  --muted-foreground: #9cb396;
+  --accent: #1e2e1e;
+  --accent-foreground: #ecf7e5;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffffff;
+  --border: #2a3d2a;
+  --input: #2a3d2a;
+  --ring: #95f68a;
+}

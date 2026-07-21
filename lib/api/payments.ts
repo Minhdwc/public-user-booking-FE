@@ -14,3 +14,10 @@ export async function getOrCreatePendingPayment(bookingId: string): Promise<IPay
 export async function createVnpayUrl(paymentId: string): Promise<{ paymentUrl: string }> {
   return paymentService.createVnpayUrl(paymentId);
 }
+
+export async function payWithSavedMethod(
+  paymentId: string,
+  userPaymentMethodId?: string,
+): Promise<{ paymentId: string; status: string; method: string; transactionCode: string }> {
+  return paymentService.payWithSavedMethod(paymentId, userPaymentMethodId);
+}

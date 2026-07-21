@@ -15,7 +15,13 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="size-10" aria-label="Đổi giao diện" disabled>
+      <Button
+        variant="outline"
+        size="icon"
+        className="size-10 rounded-full"
+        aria-label="Đổi giao diện"
+        disabled
+      >
         <SunIcon className="size-4 opacity-0" />
       </Button>
     );
@@ -28,7 +34,7 @@ export function ThemeToggle() {
       type="button"
       variant="outline"
       size="icon"
-      className="size-10"
+      className="size-10 rounded-full border-border/70 bg-card shadow-sm"
       aria-label={isDark ? 'Chuyển sang sáng' : 'Chuyển sang tối'}
       title={isDark ? 'Giao diện sáng' : 'Giao diện tối'}
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
