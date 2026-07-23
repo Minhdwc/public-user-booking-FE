@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -13,8 +13,20 @@ import { VenueCard } from '@/components/venue/VenueCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getSports } from '@/lib/api/sports';
 import { getVenues } from '@/lib/api/venues';
+import { searchVenuesList } from '@/lib/api/search';
 
 const PAGE_SIZE = 9;
+
+function findSportByQuery(query: string, sports: { id: string; name: string }[]) {
+  const q = query.trim().toLowerCase();
+  if (!q) return null;
+  return (
+    sports.find((sport) => {
+      const name = sport.name.trim().toLowerCase();
+      return name === q || name.includes(q) || q.includes(name);
+    }) || null
+  );
+}
 
 export function VenuesPageContent() {
   const router = useRouter();
@@ -23,6 +35,7 @@ export function VenuesPageContent() {
 
   const search = searchParams.get('search') ?? '';
   const sportId = searchParams.get('sport');
+  const date = searchParams.get('date');
   const page = Math.max(1, Number(searchParams.get('page') || '1'));
 
   const updateParams = (updates: Record<string, string | null>) => {
@@ -40,9 +53,25 @@ export function VenuesPageContent() {
     queryFn: getSports,
   });
 
+  useEffect(() => {
+    if (!search.trim() || !sportsQuery.data?.length) return;
+
+    const matchedSport = findSportByQuery(search, sportsQuery.data);
+    if (!matchedSport) return;
+
+    const params = new URLSearchParams({ sport: matchedSport.id });
+    if (date) params.set('date', date);
+    router.replace(`/fields?${params.toString()}`);
+  }, [date, router, search, sportsQuery.data]);
+
   const venuesQuery = useQuery({
     queryKey: ['venues', { search, page, limit: PAGE_SIZE }],
-    queryFn: () => getVenues({ search: search || undefined, page, limit: PAGE_SIZE }),
+    queryFn: async () => {
+      if (search.trim()) {
+        return searchVenuesList({ search, page, limit: PAGE_SIZE });
+      }
+      return getVenues({ search: search || undefined, page, limit: PAGE_SIZE });
+    },
   });
 
   const filteredVenues = useMemo(() => {
@@ -67,12 +96,20 @@ export function VenuesPageContent() {
         <SearchBar
           defaultValue={search}
           placeholder="Nhập từ khóa tìm kiếm..."
-          onSubmit={(query) =>
+          onSubmit={(query) => {
+            const matchedSport = findSportByQuery(query, sportsQuery.data ?? []);
+            if (matchedSport) {
+              const params = new URLSearchParams({ sport: matchedSport.id });
+              if (date) params.set('date', date);
+              router.push(`/fields?${params.toString()}`);
+              return;
+            }
+
             updateParams({
               search: query || null,
               page: null,
-            })
-          }
+            });
+          }}
         />
         <SportFilterChips
           sports={sportsQuery.data ?? []}
@@ -90,7 +127,7 @@ export function VenuesPageContent() {
       {venuesQuery.isLoading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: PAGE_SIZE }).map((_, index) => (
-            <Skeleton key={index} className="h-72 w-full rounded-md" />
+            <Skeleton key={index} className="h-72 w-full rounded-lg" />
           ))}
         </div>
       ) : null}

@@ -22,7 +22,6 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/', label: 'Trang chủ' },
   { href: '/fields', label: 'Sân' },
-  { href: '/venues', label: 'Cơ sở' },
   { href: '/bookings', label: 'Lịch đặt' },
 ];
 
@@ -34,7 +33,8 @@ function isNavActive(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, isAuthenticated, isHydrated } = useAuthStore();
+  const { user, isAuthenticated, isHydrated, isSessionReady } = useAuthStore();
+  const isLoggedIn = isSessionReady && isAuthenticated;
   const { logout, isLoggingOut } = useAuth();
 
   return (
@@ -45,7 +45,7 @@ export function Header() {
             <Image
               src={logoSquare}
               alt="Minh Đức Booking Sport"
-              className="size-9 rounded-md object-cover shadow-sm"
+              className="size-9 rounded-xl object-cover shadow-sm"
               priority
             />
             <span className="text-lg font-bold tracking-tight text-foreground">
@@ -76,8 +76,8 @@ export function Header() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          {isHydrated && isAuthenticated ? (
-            <Button asChild variant="ghost" size="sm" className="hidden rounded-md sm:inline-flex">
+          {isHydrated && isLoggedIn ? (
+            <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
               <Link href="/bookings">
                 <CalendarDays className="size-4" />
                 Lịch đặt
@@ -85,14 +85,14 @@ export function Header() {
             </Button>
           ) : null}
 
-          {isHydrated && isAuthenticated && user ? (
+          {isHydrated && isLoggedIn && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="gap-2 rounded-md border-border/70 bg-card shadow-sm"
+                  className="gap-2 rounded-lg border-border/70 bg-card shadow-sm"
                 >
-                  <span className="flex size-7 items-center justify-center overflow-hidden rounded-md bg-primary/10">
+                  <span className="flex size-7 items-center justify-center overflow-hidden rounded-lg bg-primary/10">
                     {user.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={user.avatarUrl} alt="" className="size-full object-cover" />
@@ -103,7 +103,7 @@ export function Header() {
                   <span className="hidden max-w-32 truncate sm:inline">{user.name}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-md">
+              <DropdownMenuContent align="end" className="w-48 rounded-lg">
                 <DropdownMenuItem asChild>
                   <Link href="/account">Tài khoản</Link>
                 </DropdownMenuItem>
@@ -117,7 +117,7 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild size="sm" className="rounded-md shadow-sm">
+            <Button asChild size="sm" className="rounded-lg shadow-sm">
               <Link href="/login">Đăng nhập</Link>
             </Button>
           )}
@@ -125,7 +125,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-md md:hidden"
+            className="rounded-lg md:hidden"
             onClick={() => setMobileOpen((open) => !open)}
             aria-label="Mở menu"
           >
@@ -145,7 +145,7 @@ export function Header() {
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
-                    'px-3 py-2.5 text-sm font-medium transition-colors',
+                    'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     active
                       ? 'border-l-2 border-primary bg-primary/5 text-foreground'
                       : 'text-muted-foreground hover:bg-accent',
@@ -155,11 +155,11 @@ export function Header() {
                 </Link>
               );
             })}
-            {isHydrated && isAuthenticated ? (
+            {isHydrated && isLoggedIn ? (
               <Link
                 href="/bookings"
                 onClick={() => setMobileOpen(false)}
-                className="inline-flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
               >
                 <CalendarDays className="size-4" />
                 Lịch đặt sân

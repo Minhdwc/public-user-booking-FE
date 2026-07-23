@@ -12,7 +12,7 @@ export function Footer() {
             <Image
               src={logoSquare}
               alt="Minh Đức Booking Sport"
-              className="size-9 object-cover"
+              className="size-9 rounded-xl object-cover shadow-sm"
               priority
             />
             <span className="text-lg font-bold">Minh Đức Booking Sport</span>
@@ -26,7 +26,7 @@ export function Footer() {
               <a
                 key={index}
                 href="#"
-                className="inline-flex size-10 items-center justify-center rounded-md border border-white/10 bg-white/5 text-primary-foreground/80 transition-colors hover:bg-white/10"
+                className="inline-flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-primary-foreground/80 transition-colors hover:bg-white/10"
               >
                 <Icon className="size-4" />
               </a>

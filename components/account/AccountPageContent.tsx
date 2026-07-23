@@ -48,7 +48,7 @@ export function AccountPageContent() {
         description="Quản lý hồ sơ, bảo mật và phương thức thanh toán của bạn."
       />
 
-      <Card className="rounded-md border-border/70 shadow-sm">
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle>Hồ sơ</CardTitle>
           <CardDescription>Cập nhật thông tin cá nhân và ảnh đại diện</CardDescription>
@@ -58,7 +58,7 @@ export function AccountPageContent() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-md border-border/70 shadow-sm">
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle>Đổi mật khẩu</CardTitle>
           <CardDescription>Đảm bảo mật khẩu mạnh và khác mật khẩu cũ</CardDescription>

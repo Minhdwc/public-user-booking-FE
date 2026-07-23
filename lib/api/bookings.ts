@@ -10,14 +10,8 @@ export async function getBookingById(id: string): Promise<IBooking> {
   return bookingService.getBooking(id);
 }
 
-export async function createBooking(
-  payload: CreateBookingPayload | Partial<IBooking>,
-): Promise<IBooking> {
-  return bookingService.createBooking({
-    fieldId: payload.fieldId!,
-    timeslotId: payload.timeslotId!,
-    date: payload.date!,
-  });
+export async function createBooking(payload: CreateBookingPayload): Promise<IBooking> {
+  return bookingService.createBooking(payload);
 }
 
 export async function cancelBooking(id: string): Promise<IBooking> {

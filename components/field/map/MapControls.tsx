@@ -46,7 +46,7 @@ export function MapControls({ onLocationFound, className }: MapControlsProps) {
       <button
         type="button"
         onClick={() => map.zoomIn()}
-        className="inline-flex size-10 items-center justify-center rounded-md border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent"
+        className="inline-flex size-10 items-center justify-center rounded-lg border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent"
         aria-label="Phóng to"
       >
         <Plus className="size-4" />
@@ -54,7 +54,7 @@ export function MapControls({ onLocationFound, className }: MapControlsProps) {
       <button
         type="button"
         onClick={() => map.zoomOut()}
-        className="inline-flex size-10 items-center justify-center rounded-md border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent"
+        className="inline-flex size-10 items-center justify-center rounded-lg border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent"
         aria-label="Thu nhỏ"
       >
         <Minus className="size-4" />
@@ -63,7 +63,7 @@ export function MapControls({ onLocationFound, className }: MapControlsProps) {
         type="button"
         onClick={handleLocate}
         disabled={locating}
-        className="inline-flex size-10 items-center justify-center rounded-md border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent disabled:opacity-60"
+        className="inline-flex size-10 items-center justify-center rounded-lg border border-border/70 bg-card text-foreground shadow-md transition-colors hover:bg-accent disabled:opacity-60"
         aria-label="Vị trí của tôi"
       >
         <LocateFixed className={cn('size-4', locating && 'animate-pulse text-primary')} />

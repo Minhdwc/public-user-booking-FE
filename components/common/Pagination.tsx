@@ -19,20 +19,20 @@ export function Pagination({ page, hasNext, onPageChange, className }: Paginatio
       <Button
         variant="outline"
         size="sm"
-        className="rounded-md"
+        className="rounded-lg"
         disabled={!hasPrev}
         onClick={() => onPageChange(page - 1)}
       >
         <ChevronLeft className="h-4 w-4" />
         Trước
       </Button>
-      <span className="rounded-md bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
+      <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
         Trang {page}
       </span>
       <Button
         variant="outline"
         size="sm"
-        className="rounded-md"
+        className="rounded-lg"
         disabled={!hasNext}
         onClick={() => onPageChange(page + 1)}
       >

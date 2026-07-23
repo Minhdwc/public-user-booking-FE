@@ -10,8 +10,8 @@ export const reviewKeys = {
   all: ['reviews'] as const,
   lists: () => [...reviewKeys.all, 'list'] as const,
   list: (params: ListParams = {}) => [...reviewKeys.lists(), params] as const,
-  byField: (fieldId: string) => [...reviewKeys.all, 'field', fieldId] as const,
-  eligibility: (fieldId: string) => [...reviewKeys.all, 'eligibility', fieldId] as const,
+  byVenue: (venueId: string) => [...reviewKeys.all, 'venue', venueId] as const,
+  eligibility: (venueId: string) => [...reviewKeys.all, 'eligibility', venueId] as const,
   details: () => [...reviewKeys.all, 'detail'] as const,
   detail: (id: string) => [...reviewKeys.details(), id] as const,
 };
@@ -22,14 +22,11 @@ export const useReviews = (params?: ListParams) =>
     queryFn: async () => unwrapList(await reviewService.getReviews({ limit: 100, ...params })),
   });
 
-export const useReviewsByField = (fieldId: string) =>
+export const useReviewsByVenue = (venueId: string) =>
   useQuery({
-    queryKey: reviewKeys.byField(fieldId),
-    queryFn: async () => {
-      const reviews = unwrapList(await reviewService.getReviews({ limit: 200 }));
-      return reviews.filter((review) => review.fieldId === fieldId);
-    },
-    enabled: Boolean(fieldId),
+    queryKey: reviewKeys.byVenue(venueId),
+    queryFn: async () => unwrapList(await reviewService.getReviews({ venueId, limit: 200 })),
+    enabled: Boolean(venueId),
   });
 
 export const useCreateReview = () => {
@@ -37,18 +34,17 @@ export const useCreateReview = () => {
   return useMutation({
     mutationFn: (body: CreateReviewPayload) => reviewService.createReview(body),
     onSuccess: (review, variables) => {
-      const fieldId = review?.fieldId ?? variables.fieldId;
+      const venueId = review?.venueId ?? variables.venueId;
       queryClient.invalidateQueries({ queryKey: reviewKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.byField(fieldId) });
-      queryClient.invalidateQueries({ queryKey: ['reviews', 'field', fieldId] });
-      queryClient.invalidateQueries({ queryKey: reviewKeys.eligibility(fieldId) });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.byVenue(venueId) });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.eligibility(venueId) });
     },
   });
 };
 
-export const useReviewEligibility = (fieldId: string, enabled = true) =>
+export const useReviewEligibility = (venueId: string, enabled = true) =>
   useQuery({
-    queryKey: reviewKeys.eligibility(fieldId),
-    queryFn: () => reviewService.getReviewEligibility(fieldId),
-    enabled: Boolean(fieldId) && enabled,
+    queryKey: reviewKeys.eligibility(venueId),
+    queryFn: () => reviewService.getReviewEligibility(venueId),
+    enabled: Boolean(venueId) && enabled,
   });

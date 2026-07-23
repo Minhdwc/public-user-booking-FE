@@ -2,15 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { BackLink } from '@/components/common/BackLink';
-import { BookingPanel } from '@/components/field/BookingPanel';
-import { FieldInfo } from '@/components/field/FieldInfo';
+import { BookingPanel } from '@/components/field/detail/booking-panel';
+import { FieldInfo } from '@/components/field/detail/info';
 import { ReviewList } from '@/components/review/ReviewList';
 import { WriteReviewDialog } from '@/components/review/WriteReviewDialog';
 import { ErrorState } from '@/components/common/ErrorState';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getFieldById } from '@/lib/api/fields';
-import { getReviewsByFieldId } from '@/lib/api/reviews';
+import { getReviewsByVenueId } from '@/lib/api/reviews';
 
 interface FieldDetailContentProps {
   fieldId: string;
@@ -22,18 +21,25 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
     queryFn: () => getFieldById(fieldId),
   });
 
+  const venueId = fieldQuery.data?.venueId ?? fieldQuery.data?.venue?.id ?? '';
+
   const reviewsQuery = useQuery({
-    queryKey: ['reviews', 'field', fieldId],
-    queryFn: () => getReviewsByFieldId(fieldId),
-    enabled: Boolean(fieldId),
+    queryKey: ['reviews', 'venue', venueId],
+    queryFn: () => getReviewsByVenueId(venueId),
+    enabled: Boolean(venueId),
   });
 
   if (fieldQuery.isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="aspect-video w-full rounded-md" />
-        <Skeleton className="h-60 w-full rounded-md" />
+      <div className="space-y-8">
+        <Skeleton className="h-5 w-40" />
+        <Skeleton className="aspect-video w-full rounded-2xl" />
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+        </div>
+        <Skeleton className="h-48 w-full rounded-2xl" />
       </div>
     );
   }
@@ -53,15 +59,16 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-8">
       <BackLink
         href={fieldQuery.data.venue ? `/venues/${fieldQuery.data.venue.id}` : '/fields'}
         label={`Quay lại ${fieldQuery.data.venue?.name ?? 'danh sách sân'}`}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start xl:gap-10">
         <FieldInfo field={fieldQuery.data} />
-        <div className="lg:sticky lg:top-24">
+
+        <div className="xl:sticky xl:top-24">
           <BookingPanel
             fieldId={fieldQuery.data.id}
             fieldName={fieldQuery.data.name}
@@ -70,25 +77,31 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
         </div>
       </div>
 
-      <Card className="rounded-md border-border/70 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-          <CardTitle className="text-foreground">Đánh giá từ người chơi</CardTitle>
-          <WriteReviewDialog fieldId={fieldId} />
-        </CardHeader>
-        <CardContent>
+      <section className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-border/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cộng đồng</p>
+            <h2 className="text-lg font-bold text-foreground">Đánh giá từ người chơi</h2>
+          </div>
+          {venueId ? (
+            <WriteReviewDialog venueId={venueId} returnPath={`/fields/${fieldId}`} />
+          ) : null}
+        </div>
+
+        <div className="p-5 sm:p-6">
           {reviewsQuery.isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-20 w-full rounded-xl" />
             </div>
           ) : reviewsQuery.isError ? (
             <ErrorState message="Không thể tải đánh giá" onRetry={() => reviewsQuery.refetch()} />
           ) : (
             <ReviewList reviews={reviewsQuery.data ?? []} />
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

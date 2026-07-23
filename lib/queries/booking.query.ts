@@ -35,9 +35,11 @@ export const useCreateBooking = () => {
     mutationFn: (body: CreateBookingPayload) => bookingService.createBooking(body),
     onSuccess: (booking) => {
       queryClient.invalidateQueries({ queryKey: bookingKeys.all });
-      queryClient.invalidateQueries({
-        queryKey: fieldKeys.detail(booking.fieldId),
-      });
+      for (const item of booking.items ?? []) {
+        queryClient.invalidateQueries({
+          queryKey: fieldKeys.detail(item.fieldId),
+        });
+      }
     },
   });
 };

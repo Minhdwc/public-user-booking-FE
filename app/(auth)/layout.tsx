@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <Image
             src={logoSquare}
             alt="Minh Đức Booking Sport"
-            className="size-10 rounded-md object-cover shadow-sm"
+            className="size-10 rounded-lg object-cover shadow-sm"
             priority
           />
           <span className="text-xl font-bold text-foreground">Minh Đức Booking Sport</span>

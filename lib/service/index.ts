@@ -11,4 +11,3 @@ export { userPaymentMethodService } from './user-payment-method.service';
 export { favoritesService } from './favorites.service';
 export { amenityService } from './amenity.service';
 export { notificationService } from './notification.service';
-export { timeslotService } from './timeslot.service';

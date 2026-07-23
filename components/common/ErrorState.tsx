@@ -30,7 +30,7 @@ export function ErrorState({
         <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
       </div>
       {onRetry ? (
-        <Button variant="outline" className="rounded-md" onClick={onRetry}>
+        <Button variant="outline" className="rounded-lg" onClick={onRetry}>
           Thử lại
         </Button>
       ) : null}

@@ -11,15 +11,15 @@ interface GuestOnlyProps {
 
 export function GuestOnly({ children, redirectTo = '/' }: GuestOnlyProps) {
   const router = useRouter();
-  const { isAuthenticated, isHydrated } = useAuthStore();
+  const { isAuthenticated, isHydrated, isSessionReady } = useAuthStore();
 
   useEffect(() => {
-    if (isHydrated && isAuthenticated) {
+    if (isHydrated && isSessionReady && isAuthenticated) {
       router.replace(redirectTo);
     }
-  }, [isAuthenticated, isHydrated, redirectTo, router]);
+  }, [isAuthenticated, isHydrated, isSessionReady, redirectTo, router]);
 
-  if (!isHydrated || isAuthenticated) {
+  if (!isHydrated || !isSessionReady || isAuthenticated) {
     return null;
   }
 

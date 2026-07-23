@@ -14,10 +14,9 @@ import { createVnpayUrl, getOrCreatePendingPayment, payWithSavedMethod } from '@
 import { ApiError } from '@/lib/api/errors';
 import { getFieldAvailability } from '@/lib/api/fields';
 import { unwrapList } from '@/lib/api/response';
-import { IUserPaymentMethod } from '@/lib/api/types';
+import { IAvailabilitySlot, IUserPaymentMethod } from '@/lib/api/types';
 import { userPaymentMethodService } from '@/lib/service';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import { ITimeslot } from '@/lib/types';
 import { buildFieldBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +28,12 @@ interface BookingPanelProps {
 
 type SubmitPhase = 'idle' | 'holding' | 'paying';
 type CheckoutMode = 'saved' | 'vnpay';
+
+type SelectedSlot = {
+  startTime: string;
+  endTime: string;
+  subtotal: number;
+};
 
 const methodLabels: Record<IUserPaymentMethod['type'], string> = {
   bank_transfer: 'Chuyển khoản',
@@ -74,6 +79,10 @@ function formatSlotTime(value: string) {
   return value;
 }
 
+function slotKey(slot: SelectedSlot) {
+  return `${slot.startTime}|${slot.endTime}`;
+}
+
 function formatSavedMethod(method: IUserPaymentMethod) {
   const parts = [method.provider, method.maskedNumber].filter(Boolean);
   return parts.join(' · ') || methodLabels[method.type];
@@ -87,23 +96,27 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   const isHydrated = useAuthStore((state) => state.isHydrated);
 
   const draftDate = searchParams.get('date');
-  const draftTimeslotId = searchParams.get('timeslotId');
+  const draftStartTime = searchParams.get('startTime');
+  const draftEndTime = searchParams.get('endTime');
 
   const [date, setDate] = useState(draftDate || todayLocalIsoDate());
-  const [selectedTimeslotId, setSelectedTimeslotId] = useState<string | null>(draftTimeslotId);
+  const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(
+    draftStartTime && draftEndTime
+      ? { startTime: draftStartTime, endTime: draftEndTime, subtotal: price }
+      : null,
+  );
   const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
   const [checkoutMode, setCheckoutMode] = useState<CheckoutMode>('saved');
   const [selectedMethodId, setSelectedMethodId] = useState<string>('');
 
   useEffect(() => {
     if (draftDate) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDate(draftDate);
     }
-    if (draftTimeslotId) {
-      setSelectedTimeslotId(draftTimeslotId);
+    if (draftStartTime && draftEndTime) {
+      setSelectedSlot({ startTime: draftStartTime, endTime: draftEndTime, subtotal: price });
     }
-  }, [draftDate, draftTimeslotId]);
+  }, [draftDate, draftEndTime, draftStartTime, price]);
 
   const savedMethodsQuery = useQuery({
     queryKey: ['user-payment-methods'],
@@ -117,7 +130,6 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
 
   useEffect(() => {
     if (defaultMethod && !selectedMethodId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedMethodId(defaultMethod.id);
     }
     if (savedMethods.length === 0) {
@@ -134,16 +146,22 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   const createMutation = useMutation({
     mutationFn: async (payload: {
       fieldId: string;
-      timeslotId: string;
       date: string;
+      startTime: string;
+      endTime: string;
       mode: CheckoutMode;
       userPaymentMethodId?: string;
     }) => {
       setSubmitPhase('holding');
       const booking = await createBooking({
-        fieldId: payload.fieldId,
-        timeslotId: payload.timeslotId,
-        date: payload.date,
+        items: [
+          {
+            fieldId: payload.fieldId,
+            date: payload.date,
+            startTime: formatSlotTime(payload.startTime),
+            endTime: formatSlotTime(payload.endTime),
+          },
+        ],
       });
 
       try {
@@ -198,23 +216,24 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
     },
   });
 
-  const timeslots = useMemo(
-    () => availabilityQuery.data?.timeslots ?? [],
-    [availabilityQuery.data?.timeslots],
-  );
-  const selectedSlot = useMemo(
-    () => timeslots.find((slot: ITimeslot) => slot.id === selectedTimeslotId) ?? null,
-    [selectedTimeslotId, timeslots],
+  const slots = useMemo(
+    () => availabilityQuery.data?.slots ?? [],
+    [availabilityQuery.data?.slots],
   );
 
-  const handleSelectSlot = (slot: ITimeslot) => {
-    setSelectedTimeslotId(slot.id);
+  const handleSelectSlot = (slot: IAvailabilitySlot) => {
+    setSelectedSlot({
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      subtotal: slot.subtotal,
+    });
   };
 
   const goLoginToContinue = () => {
     const returnPath = buildFieldBookingReturnPath(fieldId, {
       date,
-      timeslotId: selectedTimeslotId ?? undefined,
+      startTime: selectedSlot ? formatSlotTime(selectedSlot.startTime) : undefined,
+      endTime: selectedSlot ? formatSlotTime(selectedSlot.endTime) : undefined,
     });
     router.push(buildLoginUrl(returnPath));
   };
@@ -222,7 +241,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   const handleSubmit = () => {
     if (!isHydrated) return;
 
-    if (!selectedTimeslotId) {
+    if (!selectedSlot) {
       toast.error('Vui lòng chọn khung giờ');
       return;
     }
@@ -240,8 +259,9 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
 
     createMutation.mutate({
       fieldId,
-      timeslotId: selectedTimeslotId,
       date,
+      startTime: selectedSlot.startTime,
+      endTime: selectedSlot.endTime,
       mode: checkoutMode,
       userPaymentMethodId: checkoutMode === 'saved' ? selectedMethodId : undefined,
     });
@@ -257,8 +277,10 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
     return checkoutMode === 'saved' ? 'Đặt sân & thanh toán ngay' : 'Đặt sân & thanh toán VNPay';
   })();
 
+  const displayPrice = selectedSlot?.subtotal ?? price;
+
   return (
-    <Card className="rounded-md border-border/70 shadow-sm">
+    <Card className="border-border/70 shadow-sm">
       <CardHeader>
         <CardTitle>Đặt sân</CardTitle>
         <CardDescription>
@@ -280,10 +302,10 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
                   type="button"
                   onClick={() => {
                     setDate(day.value);
-                    setSelectedTimeslotId(null);
+                    setSelectedSlot(null);
                   }}
                   className={cn(
-                    'shrink-0 rounded-md border px-3 py-2 text-left transition-colors',
+                    'shrink-0 rounded-lg border px-3 py-2 text-left transition-colors',
                     selected
                       ? 'chip-active border-primary'
                       : 'border-border bg-card hover:border-primary/50 hover:bg-muted',
@@ -325,18 +347,20 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
                 ? availabilityQuery.error.message
                 : 'Không tải được khung giờ'}
             </p>
-          ) : timeslots.length === 0 ? (
+          ) : slots.length === 0 ? (
             <p className="text-sm text-muted-foreground">Chưa có khung giờ khả dụng</p>
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {timeslots.map((slot: ITimeslot) => {
+              {slots.map((slot: IAvailabilitySlot) => {
                 const label = `${formatSlotTime(slot.startTime)}–${formatSlotTime(slot.endTime)}`;
                 const isBooked = slot.status === 'booked';
-                const isSelected = slot.id === selectedTimeslotId;
+                const isSelected =
+                  selectedSlot &&
+                  slotKey(selectedSlot) === slotKey({ ...slot, subtotal: slot.subtotal });
 
                 return (
                   <Button
-                    key={slot.id}
+                    key={slotKey({ ...slot, subtotal: slot.subtotal })}
                     type="button"
                     variant={isSelected ? 'default' : 'outline'}
                     disabled={isBooked}
@@ -352,7 +376,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
         </div>
 
         {isAuthenticated && isHydrated ? (
-          <div className="space-y-3 rounded-md border bg-muted/40 px-3 py-3">
+          <div className="space-y-3 rounded-lg border bg-muted/40 px-3 py-3">
             <Label>Thanh toán</Label>
             {savedMethodsQuery.isLoading ? (
               <Skeleton className="h-10 w-full" />
@@ -372,7 +396,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
                     <select
                       value={selectedMethodId}
                       onChange={(event) => setSelectedMethodId(event.target.value)}
-                      className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
                     >
                       {savedMethods.map((method: IUserPaymentMethod) => (
                         <option key={method.id} value={method.id}>
@@ -405,9 +429,9 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
           </div>
         ) : null}
 
-        <div className="space-y-1 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+        <div className="space-y-1 rounded-lg border bg-muted/40 px-3 py-2 text-sm">
           <p>
-            Giá: <span className="font-medium">{price.toLocaleString('vi-VN')} đ</span>
+            Giá: <span className="font-medium">{displayPrice.toLocaleString('vi-VN')} đ</span>
           </p>
           {selectedSlot ? (
             <p className="text-muted-foreground">
@@ -420,7 +444,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
         </div>
 
         <Button
-          className="w-full rounded-md shadow-sm"
+          className="w-full rounded-lg shadow-sm"
           disabled={createMutation.isPending || availabilityQuery.isLoading || !isHydrated}
           onClick={handleSubmit}
         >

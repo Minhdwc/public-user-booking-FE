@@ -34,7 +34,7 @@ function formatBookingDate(value: string) {
 
 function statusLabel(status: string) {
   switch (status) {
-    case 'pending':
+    case 'waiting_payment':
       return 'Đang giữ chỗ';
     case 'confirmed':
       return 'Đã xác nhận';
@@ -42,6 +42,8 @@ function statusLabel(status: string) {
       return 'Đã hủy';
     case 'completed':
       return 'Hoàn thành';
+    case 'expired':
+      return 'Hết hạn';
     default:
       return status;
   }
@@ -49,7 +51,7 @@ function statusLabel(status: string) {
 
 function statusClass(status: string) {
   switch (status) {
-    case 'pending':
+    case 'waiting_payment':
       return 'status-pending';
     case 'confirmed':
       return 'status-confirmed';
@@ -57,18 +59,24 @@ function statusClass(status: string) {
       return 'status-cancelled';
     case 'completed':
       return 'status-completed';
+    case 'expired':
+      return 'status-cancelled';
     default:
       return 'bg-muted text-muted-foreground';
   }
 }
 
 function canCancel(booking: IBookingWithRelations) {
-  return booking.status === 'pending' || booking.status === 'confirmed';
+  return booking.status === 'waiting_payment' || booking.status === 'confirmed';
 }
 
 function isHoldActive(booking: IBookingWithRelations) {
-  if (booking.status !== 'pending' || !booking.expiresAt) return false;
+  if (booking.status !== 'waiting_payment' || !booking.expiresAt) return false;
   return new Date(booking.expiresAt).getTime() > Date.now();
+}
+
+function getPrimaryItem(booking: IBookingWithRelations) {
+  return booking.items?.[0];
 }
 
 function PendingBookingActions({
@@ -142,19 +150,19 @@ function PendingBookingActions({
         <p className="text-sm text-muted-foreground">Đang đồng bộ trạng thái hết hạn...</p>
       )}
       <div className="flex gap-2">
-        <Button asChild variant="outline" className="rounded-md">
-          <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
+        <Button asChild variant="outline" className="rounded-lg">
+          <Link href={`/fields/${getPrimaryItem(booking)?.fieldId ?? ''}`}>Xem sân</Link>
         </Button>
         {!isExpired ? (
           <>
             {defaultSavedMethod ? (
-              <Button className="rounded-md" disabled={paying} onClick={() => void continuePayWithSaved()}>
+              <Button className="rounded-lg" disabled={paying} onClick={() => void continuePayWithSaved()}>
                 {paying && payingMode === 'saved' ? 'Đang thanh toán...' : 'Thanh toán đã lưu'}
               </Button>
             ) : null}
             <Button
               variant={defaultSavedMethod ? 'outline' : 'default'}
-              className="rounded-md"
+              className="rounded-lg"
               disabled={paying}
               onClick={() => void continuePayWithVnpay()}
             >
@@ -163,7 +171,7 @@ function PendingBookingActions({
           </>
         ) : null}
         {canCancel(booking) ? (
-          <Button variant="destructive" className="rounded-md" disabled={cancelPending} onClick={onCancel}>
+          <Button variant="destructive" className="rounded-lg" disabled={cancelPending} onClick={onCancel}>
             Hủy lịch
           </Button>
         ) : null}
@@ -242,26 +250,28 @@ export function BookingsPageContent() {
       />
 
       {bookings.length === 0 ? (
-        <Card className="rounded-md border-border/70 shadow-sm">
+        <Card className="border-border/70 shadow-sm">
           <CardHeader>
             <CardTitle>Chưa có lịch đặt</CardTitle>
             <CardDescription>Hãy tìm sân và đặt khung giờ phù hợp</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="rounded-md">
+            <Button asChild className="rounded-lg">
               <Link href="/venues">Tìm sân ngay</Link>
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {bookings.map((booking: IBookingWithRelations) => (
-            <Card key={booking.id} className="rounded-md border-border/70 shadow-sm">
+          {bookings.map((booking: IBookingWithRelations) => {
+            const primaryItem = getPrimaryItem(booking);
+            return (
+            <Card key={booking.id} className="border-border/70 shadow-sm">
               <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
                 <div className="space-y-1">
-                  <CardTitle className="text-lg">{booking.field?.name ?? 'Sân'}</CardTitle>
+                  <CardTitle className="text-lg">{primaryItem?.field?.name ?? 'Sân'}</CardTitle>
                   <CardDescription>
-                    {[booking.field?.venue?.name, booking.field?.sport?.name]
+                    {[primaryItem?.field?.venue?.name, primaryItem?.field?.sport?.name, booking.bookingCode]
                       .filter(Boolean)
                       .join(' · ') || '—'}
                   </CardDescription>
@@ -273,26 +283,29 @@ export function BookingsPageContent() {
               <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1 text-sm">
                   <p>
-                    Ngày: <span className="font-medium">{formatBookingDate(booking.date)}</span>
+                    Ngày:{' '}
+                    <span className="font-medium">
+                      {primaryItem ? formatBookingDate(primaryItem.date) : '—'}
+                    </span>
                   </p>
                   <p>
                     Giờ:{' '}
                     <span className="font-medium">
-                      {booking.timeslot
-                        ? `${formatSlotTime(booking.timeslot.startTime)}–${formatSlotTime(booking.timeslot.endTime)}`
+                      {primaryItem
+                        ? `${formatSlotTime(primaryItem.startTime)}–${formatSlotTime(primaryItem.endTime)}`
                         : '—'}
                     </span>
                   </p>
                   <p>
                     Giá:{' '}
                     <span className="font-medium">
-                      {(booking.amount ?? booking.field?.price ?? 0).toLocaleString('vi-VN')} đ
+                      {(booking.finalAmount ?? primaryItem?.subtotal ?? 0).toLocaleString('vi-VN')} đ
                     </span>
                   </p>
                 </div>
 
                 {isHoldActive(booking) ||
-                (booking.status === 'pending' && booking.expiresAt) ? (
+                (booking.status === 'waiting_payment' && booking.expiresAt) ? (
                   <PendingBookingActions
                     booking={booking}
                     cancelPending={cancelMutation.isPending}
@@ -300,13 +313,13 @@ export function BookingsPageContent() {
                   />
                 ) : (
                   <div className="flex gap-2">
-                    <Button asChild variant="outline" className="rounded-md">
-                      <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
+                    <Button asChild variant="outline" className="rounded-lg">
+                      <Link href={`/fields/${primaryItem?.fieldId ?? ''}`}>Xem sân</Link>
                     </Button>
                     {canCancel(booking) ? (
                       <Button
                         variant="destructive"
-                        className="rounded-md"
+                        className="rounded-lg"
                         disabled={cancelMutation.isPending}
                         onClick={() => cancelMutation.mutate(booking.id)}
                       >
@@ -317,7 +330,7 @@ export function BookingsPageContent() {
                 )}
               </CardContent>
             </Card>
-          ))}
+          )})}
         </div>
       )}
     </div>

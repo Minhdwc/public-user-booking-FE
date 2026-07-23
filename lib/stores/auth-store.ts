@@ -1,115 +1,81 @@
-import Cookies from 'js-cookie';
 import { create } from 'zustand';
-import {
-  ACCESS_TOKEN_COOKIE,
-  COOKIE_OPTIONS,
-  REFRESH_TOKEN_COOKIE,
-  USER_COOKIE,
-} from '@/lib/constants/auth';
 import type { User } from '@/lib/api/types';
+import {
+  clearPersistedTokens,
+  migrateLegacyStorage,
+  persistTokens,
+  readTokensFromStorage,
+} from '@/lib/storage/local-storage';
 
-/**
- * MVP: tokens stored in regular cookies (non-httpOnly) so middleware can read them.
- * Can upgrade to httpOnly cookies + BFF pattern when higher security is needed.
- */
 interface AuthState {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
+  /** False until stored tokens are validated (or absent). Prevents socket using expired tokens. */
+  isSessionReady: boolean;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
   updateUser: (user: User) => void;
   clearAuth: () => void;
-  hydrateFromCookies: () => void;
+  hydrateFromStorage: () => void;
 }
 
-function persistAuth(user: User, accessToken: string, refreshToken: string) {
-  Cookies.set(ACCESS_TOKEN_COOKIE, accessToken, { ...COOKIE_OPTIONS, expires: 7 });
-  Cookies.set(REFRESH_TOKEN_COOKIE, refreshToken, { ...COOKIE_OPTIONS, expires: 30 });
-  Cookies.set(USER_COOKIE, JSON.stringify(user), { ...COOKIE_OPTIONS, expires: 30 });
-}
+export { readTokensFromStorage };
 
-function clearPersistedAuth() {
-  Cookies.remove(ACCESS_TOKEN_COOKIE, { path: '/' });
-  Cookies.remove(REFRESH_TOKEN_COOKIE, { path: '/' });
-  Cookies.remove(USER_COOKIE, { path: '/' });
-}
-
-function readUserFromCookie(): User | null {
-  const raw = Cookies.get(USER_COOKIE);
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw) as User;
-  } catch {
-    return null;
-  }
-}
-
-export function readTokensFromCookies() {
-  return {
-    accessToken: Cookies.get(ACCESS_TOKEN_COOKIE) ?? null,
-    refreshToken: Cookies.get(REFRESH_TOKEN_COOKIE) ?? null,
-  };
-}
-
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
   isHydrated: false,
+  isSessionReady: false,
 
   setAuth: (user, accessToken, refreshToken) => {
-    persistAuth(user, accessToken, refreshToken);
+    persistTokens(accessToken, refreshToken);
     set({
       user,
       accessToken,
       refreshToken,
       isAuthenticated: true,
       isHydrated: true,
+      isSessionReady: true,
     });
   },
 
   setTokens: (accessToken, refreshToken) => {
-    Cookies.set(ACCESS_TOKEN_COOKIE, accessToken, { ...COOKIE_OPTIONS, expires: 7 });
-    Cookies.set(REFRESH_TOKEN_COOKIE, refreshToken, { ...COOKIE_OPTIONS, expires: 30 });
+    persistTokens(accessToken, refreshToken);
     set({ accessToken, refreshToken, isAuthenticated: true });
   },
 
   updateUser: (user) => {
-    const { accessToken, refreshToken } = get();
-    if (accessToken && refreshToken) {
-      persistAuth(user, accessToken, refreshToken);
-    } else {
-      Cookies.set(USER_COOKIE, JSON.stringify(user), { ...COOKIE_OPTIONS, expires: 30 });
-    }
     set({ user });
   },
 
   clearAuth: () => {
-    clearPersistedAuth();
+    clearPersistedTokens();
     set({
       user: null,
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
       isHydrated: true,
+      isSessionReady: true,
     });
   },
 
-  hydrateFromCookies: () => {
-    const { accessToken, refreshToken } = readTokensFromCookies();
-    const user = readUserFromCookie();
+  hydrateFromStorage: () => {
+    const { accessToken, refreshToken } = readTokensFromStorage();
+    const hasStoredSession = Boolean(accessToken && refreshToken);
 
     set({
-      user,
+      user: null,
       accessToken,
       refreshToken,
-      isAuthenticated: Boolean(accessToken && refreshToken),
+      isAuthenticated: hasStoredSession,
       isHydrated: true,
+      isSessionReady: !hasStoredSession,
     });
   },
 }));
@@ -119,5 +85,6 @@ export function getAuthState() {
 }
 
 if (typeof window !== 'undefined') {
-  useAuthStore.getState().hydrateFromCookies();
+  migrateLegacyStorage();
+  useAuthStore.getState().hydrateFromStorage();
 }

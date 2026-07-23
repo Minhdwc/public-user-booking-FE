@@ -1,5 +1,5 @@
 import { PageShell } from '@/components/layout/PageShell';
-import { FieldDetailContent } from '@/components/field/FieldDetailContent';
+import { FieldDetailContent } from '@/components/field/detail';
 
 interface FieldDetailPageProps {
   params: Promise<{ id: string }>;

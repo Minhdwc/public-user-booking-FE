@@ -1,7 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { ApiError, normalizeApiErrorMessage } from '@/lib/api/errors';
 import type { ApiErrorBody, ApiResponse, RefreshResponse } from '@/lib/api/types';
-import { getAuthState, readTokensFromCookies } from '@/lib/stores/auth-store';
+import { getAuthState, readTokensFromStorage } from '@/lib/stores/auth-store';
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,11 +22,11 @@ function isAuthEndpoint(url?: string) {
 }
 
 function getAccessToken() {
-  return getAuthState().accessToken ?? readTokensFromCookies().accessToken;
+  return getAuthState().accessToken ?? readTokensFromStorage().accessToken;
 }
 
 function getRefreshToken() {
-  return getAuthState().refreshToken ?? readTokensFromCookies().refreshToken;
+  return getAuthState().refreshToken ?? readTokensFromStorage().refreshToken;
 }
 
 async function refreshAccessToken(): Promise<RefreshResponse> {
@@ -60,7 +60,16 @@ function getRefreshPromise() {
 function redirectToLogin() {
   if (typeof window === 'undefined') return;
 
-  const redirect = `${window.location.pathname}${window.location.search}`;
+  const pathname = window.location.pathname;
+  if (pathname === '/login' || pathname === '/register') return;
+
+  const protectedPrefixes = ['/bookings', '/account', '/chat'];
+  const isProtected = protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+  if (!isProtected) return;
+
+  const redirect = `${pathname}${window.location.search}`;
   const loginUrl = `/login?redirect=${encodeURIComponent(redirect)}`;
   window.location.href = loginUrl;
 }

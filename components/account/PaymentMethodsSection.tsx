@@ -99,7 +99,7 @@ function AddPaymentMethodDialog() {
                   type: event.target.value as CreateUserPaymentMethodPayload['type'],
                 }))
               }
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
             >
               <option value="bank_transfer">Chuyển khoản</option>
               <option value="momo">MoMo</option>
@@ -201,7 +201,7 @@ export function PaymentMethodsSection() {
   const methods = methodsQuery.data ?? [];
 
   return (
-    <Card className="rounded-md border-border/70 shadow-sm">
+    <Card className="border-border/70 shadow-sm">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
         <div>
           <CardTitle>Phương thức thanh toán cá nhân</CardTitle>
@@ -230,17 +230,17 @@ export function PaymentMethodsSection() {
                 className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <CreditCard className="size-4" />
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{method.provider}</p>
-                      <span className="rounded-md bg-muted px-2 py-0.5 text-xs">
+                      <span className="rounded-lg bg-muted px-2 py-0.5 text-xs">
                         {typeLabels[method.type]}
                       </span>
                       {method.isDefault ? (
-                        <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                        <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
                           Mặc định
                         </span>
                       ) : null}

@@ -13,31 +13,17 @@ export const favoriteKeys = {
   summary: () => [...favoriteKeys.all, 'summary'] as const,
 };
 
-const emptySummary: FavoritesSummary = { fieldIds: [], venueIds: [] };
+const emptySummary: FavoritesSummary = { venueIds: [] };
 
 export function useFavoritesSummary() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const isSessionReady = useAuthStore((state) => state.isSessionReady);
 
   return useQuery({
     queryKey: favoriteKeys.summary(),
     queryFn: () => favoritesService.getSummary(),
-    enabled: isHydrated && isAuthenticated,
+    enabled: isSessionReady && isAuthenticated,
     staleTime: 60_000,
-  });
-}
-
-export function useToggleFieldFavorite() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (fieldId: string) => favoritesService.toggleField(fieldId),
-    onSuccess: (data: ToggleFavoriteResponse) => {
-      queryClient.setQueryData(favoriteKeys.summary(), {
-        fieldIds: data.fieldIds,
-        venueIds: data.venueIds,
-      });
-    },
   });
 }
 
@@ -48,26 +34,15 @@ export function useToggleVenueFavorite() {
     mutationFn: (venueId: string) => favoritesService.toggleVenue(venueId),
     onSuccess: (data: ToggleFavoriteResponse) => {
       queryClient.setQueryData(favoriteKeys.summary(), {
-        fieldIds: data.fieldIds,
         venueIds: data.venueIds,
       });
     },
   });
 }
 
-export function useFavoriteFieldIds() {
-  const { data } = useFavoritesSummary();
-  return data?.fieldIds ?? emptySummary.fieldIds;
-}
-
 export function useFavoriteVenueIds() {
   const { data } = useFavoritesSummary();
   return data?.venueIds ?? emptySummary.venueIds;
-}
-
-export function useIsFieldFavorite(fieldId: string) {
-  const fieldIds = useFavoriteFieldIds();
-  return fieldIds.includes(fieldId);
 }
 
 export function useIsVenueFavorite(venueId: string) {

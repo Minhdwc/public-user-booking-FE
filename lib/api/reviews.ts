@@ -6,7 +6,6 @@ export async function getReviews(): Promise<ReviewWithRelations[]> {
   return unwrapList(await reviewService.getReviews({ limit: 200 }));
 }
 
-export async function getReviewsByFieldId(fieldId: string): Promise<ReviewWithRelations[]> {
-  const reviews = await getReviews();
-  return reviews.filter((review) => review.fieldId === fieldId);
+export async function getReviewsByVenueId(venueId: string): Promise<ReviewWithRelations[]> {
+  return unwrapList(await reviewService.getReviews({ venueId, limit: 200 }));
 }

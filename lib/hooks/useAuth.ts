@@ -7,7 +7,6 @@ import * as authApi from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
 import { favoriteKeys } from '@/lib/queries/favorites.query';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import { getSafeRedirectPath } from '@/lib/utils/redirect';
 
 export function useAuth() {
   const router = useRouter();
@@ -24,7 +23,9 @@ export function useAuth() {
     setAuth(data.user, data.accessToken, data.refreshToken);
     await queryClient.invalidateQueries({ queryKey: favoriteKeys.summary() });
     toast.success('Đăng nhập thành công');
-    router.replace(getSafeRedirectPath(redirectTo));
+    router.replace(
+      redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/',
+    );
     return data;
   };
 
@@ -33,7 +34,9 @@ export function useAuth() {
     setAuth(data.user, data.accessToken, data.refreshToken);
     await queryClient.invalidateQueries({ queryKey: favoriteKeys.summary() });
     toast.success('Đăng ký thành công');
-    router.replace(getSafeRedirectPath(redirectTo));
+    router.replace(
+      redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/',
+    );
     return data;
   };
 

@@ -3,38 +3,27 @@
 import { useRouter } from 'next/navigation';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  useFavoritesSummary,
-  useToggleFieldFavorite,
-  useToggleVenueFavorite,
-} from '@/lib/queries/favorites.query';
+import { useFavoritesSummary, useToggleVenueFavorite } from '@/lib/queries/favorites.query';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
-type FavoriteTarget =
-  | { type: 'field'; id: string; name: string }
-  | { type: 'venue'; id: string; name: string };
-
 interface FavoriteButtonProps {
-  target: FavoriteTarget;
+  venueId: string;
+  venueName: string;
   className?: string;
   iconClassName?: string;
 }
 
-export function FavoriteButton({ target, className, iconClassName }: FavoriteButtonProps) {
+export function FavoriteButton({ venueId, venueName, className, iconClassName }: FavoriteButtonProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isHydrated = useAuthStore((state) => state.isHydrated);
-  const toggleField = useToggleFieldFavorite();
   const toggleVenue = useToggleVenueFavorite();
   const { data: summary } = useFavoritesSummary();
 
-  const isFavorite =
-    target.type === 'field'
-      ? (summary?.fieldIds.includes(target.id) ?? false)
-      : (summary?.venueIds.includes(target.id) ?? false);
-  const isPending = toggleField.isPending || toggleVenue.isPending;
+  const isFavorite = summary?.venueIds.includes(venueId) ?? false;
+  const isPending = toggleVenue.isPending;
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -47,13 +36,9 @@ export function FavoriteButton({ target, className, iconClassName }: FavoriteBut
     }
 
     try {
-      const result =
-        target.type === 'field'
-          ? await toggleField.mutateAsync(target.id)
-          : await toggleVenue.mutateAsync(target.id);
-      const label = target.type === 'field' ? 'sân' : 'cơ sở';
-      toast.message(result.isFavorite ? `Đã lưu ${label}` : `Đã bỏ lưu ${label}`, {
-        description: target.name,
+      const result = await toggleVenue.mutateAsync(venueId);
+      toast.message(result.isFavorite ? 'Đã lưu cơ sở' : 'Đã bỏ lưu cơ sở', {
+        description: venueName,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Không thể cập nhật yêu thích';

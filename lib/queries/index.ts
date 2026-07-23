@@ -34,7 +34,7 @@ export {
 
 export { paymentMethodKeys, usePaymentMethods, usePaymentMethod } from './payment-method.query';
 
-export { reviewKeys, useReviews, useReviewsByField, useCreateReview } from './review.query';
+export { reviewKeys, useReviews, useReviewsByVenue, useCreateReview } from './review.query';
 
 export { amenityKeys, useAmenities, useAmenitiesByVenue } from './amenity.query';
 

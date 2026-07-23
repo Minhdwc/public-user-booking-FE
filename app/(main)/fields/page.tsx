@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { FieldsPageContent } from '@/components/field/FieldsPageContent';
+import { FieldsPageContent } from '@/components/field/fields-page';
 
 export default function FieldsPage() {
   return (

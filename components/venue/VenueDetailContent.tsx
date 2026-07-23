@@ -3,17 +3,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
 import { BackLink } from '@/components/common/BackLink';
+import { VenueChatButton } from '@/components/chat/ChatPageContent';
 import { ErrorState } from '@/components/common/ErrorState';
-import { FieldCard } from '@/components/field/FieldCard';
+import { FieldCard } from '@/components/field/card';
 import { VenueGallery } from '@/components/venue/VenueGallery';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getVenueById } from '@/lib/api/venues';
+import { useAuthStore } from '@/lib/stores/auth-store';
 
 interface VenueDetailContentProps {
   venueId: string;
 }
 
 export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['venues', venueId],
     queryFn: () => getVenueById(venueId),
@@ -23,8 +27,8 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="aspect-video w-full rounded-md" />
-        <Skeleton className="h-40 w-full rounded-md" />
+        <Skeleton className="aspect-video w-full rounded-lg" />
+        <Skeleton className="h-40 w-full rounded-lg" />
       </div>
     );
   }
@@ -50,6 +54,11 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
             <MapPin className="mt-0.5 size-4 shrink-0" />
             {data.location}
           </p>
+          {isHydrated && isAuthenticated ? (
+            <div className="mt-4">
+              <VenueChatButton venueId={venueId} />
+            </div>
+          ) : null}
         </div>
 
         <VenueGallery images={data.images ?? []} venueName={data.name} />

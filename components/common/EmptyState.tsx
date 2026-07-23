@@ -20,7 +20,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-4 rounded-md border border-dashed border-border/70 bg-muted/30 p-10 text-center',
+        'flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/70 bg-muted/30 p-10 text-center',
         className,
       )}
     >
@@ -32,7 +32,7 @@ export function EmptyState({
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
       </div>
       {actionLabel && onAction ? (
-        <Button variant="outline" className="rounded-md" onClick={onAction}>
+        <Button variant="outline" className="rounded-lg" onClick={onAction}>
           {actionLabel}
         </Button>
       ) : null}

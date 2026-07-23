@@ -89,7 +89,7 @@ export function PaymentsResultContent() {
     const booking = paymentQuery.data?.booking;
 
     return (
-      <Card className="rounded-md border-border/70 shadow-sm">
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle className="text-foreground">Thanh toán thành công</CardTitle>
           <CardDescription>
@@ -100,31 +100,39 @@ export function PaymentsResultContent() {
           {paymentQuery.isLoading ? (
             <Skeleton className="h-20 w-full" />
           ) : booking ? (
+            (() => {
+              const primaryItem = booking.items?.[0];
+              return (
             <div className="space-y-1 text-sm">
               <p>
-                Sân: <span className="font-medium">{booking.field?.name ?? '—'}</span>
+                Sân: <span className="font-medium">{primaryItem?.field?.name ?? '—'}</span>
               </p>
               <p>
-                Cơ sở: <span className="font-medium">{booking.field?.venue?.name ?? '—'}</span>
+                Cơ sở: <span className="font-medium">{primaryItem?.field?.venue?.name ?? '—'}</span>
               </p>
               <p>
-                Ngày: <span className="font-medium">{formatBookingDate(booking.date)}</span>
+                Ngày:{' '}
+                <span className="font-medium">
+                  {primaryItem ? formatBookingDate(primaryItem.date) : '—'}
+                </span>
               </p>
               <p>
                 Giờ:{' '}
                 <span className="font-medium">
-                  {booking.timeslot
-                    ? `${formatSlotTime(booking.timeslot.startTime)}–${formatSlotTime(booking.timeslot.endTime)}`
+                  {primaryItem
+                    ? `${formatSlotTime(primaryItem.startTime)}–${formatSlotTime(primaryItem.endTime)}`
                     : '—'}
                 </span>
               </p>
               <p>
                 Số tiền:{' '}
                 <span className="font-medium">
-                  {(paymentQuery.data?.amount ?? booking.amount ?? 0).toLocaleString('vi-VN')} đ
+                  {(paymentQuery.data?.amount ?? booking.finalAmount ?? 0).toLocaleString('vi-VN')} đ
                 </span>
               </p>
             </div>
+              );
+            })()
           ) : (
             <p className="text-sm text-muted-foreground">Thanh toán đã ghi nhận thành công.</p>
           )}
@@ -139,7 +147,7 @@ export function PaymentsResultContent() {
 
   if (status === 'failed') {
     return (
-      <Card className="rounded-md border-border/70 shadow-sm">
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle className="text-foreground">Thanh toán thất bại</CardTitle>
           <CardDescription>
@@ -169,7 +177,7 @@ export function PaymentsResultContent() {
           : 'Không tìm thấy thanh toán';
 
     return (
-      <Card className="rounded-md border-border/70 shadow-sm">
+      <Card className="border-border/70 shadow-sm">
         <CardHeader>
           <CardTitle className="text-foreground">{title}</CardTitle>
           <CardDescription>
@@ -187,7 +195,7 @@ export function PaymentsResultContent() {
   }
 
   return (
-    <Card className="rounded-md border-border/70 shadow-sm">
+    <Card className="border-border/70 shadow-sm">
       <CardHeader>
         <CardTitle className="text-foreground">Kết quả thanh toán</CardTitle>
         <CardDescription>

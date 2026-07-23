@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   ArrowRight,
   CalendarDays,
@@ -20,7 +20,10 @@ import { VenueCard } from '@/components/venue/VenueCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getSports } from '@/lib/api/sports';
+import { getRecentlyViewedVenues, getSearchSuggestions } from '@/lib/api/search';
 import { getVenues } from '@/lib/api/venues';
+import { useAuthStore } from '@/lib/stores/auth-store';
+import type { SearchSuggestion } from '@/lib/service/search.service';
 import type { VenueWithFields } from '@/lib/api/types';
 
 const weekdayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -52,25 +55,52 @@ function next7Days() {
 }
 
 function HeroSearchBar({ onSearch }: { onSearch: (query: string, date: string) => void }) {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [date, setDate] = useState(todayLocalIsoDate());
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const days = useMemo(() => next7Days(), []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  const suggestionsQuery = useQuery({
+    queryKey: ['search', 'suggestions', debouncedQuery],
+    queryFn: () => getSearchSuggestions(debouncedQuery, 8),
+    enabled: showSuggestions,
+  });
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    setShowSuggestions(false);
     onSearch(query.trim(), date);
   };
 
+  const handleSuggestionSelect = (suggestion: SearchSuggestion) => {
+    setShowSuggestions(false);
+    if (suggestion.type === 'venue' && suggestion.venueId) {
+      router.push(`/venues/${suggestion.venueId}`);
+      return;
+    }
+    setQuery(suggestion.label);
+    onSearch(suggestion.label, date);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-4xl">
-      <div className="flex flex-col gap-2 rounded-md border border-border/70 bg-card p-2 shadow-lg md:flex-row">
-        <div className="flex flex-1 items-center gap-3 border-b border-border/30 px-4 py-3 md:border-b-0 md:border-r">
+    <form onSubmit={handleSubmit} className="relative w-full max-w-4xl">
+      <div className="flex flex-col gap-2 rounded-xl border border-border/70 bg-card p-2 shadow-lg md:flex-row">
+        <div className="relative flex flex-1 items-center gap-3 border-b border-border/30 px-4 py-3 md:border-b-0 md:border-r">
           <MapPinned className="size-5 shrink-0 text-primary" />
           <input
             type="text"
             value={query}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => window.setTimeout(() => setShowSuggestions(false), 150)}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Bạn muốn chơi ở đâu?"
+            placeholder="Tìm kiếm"
             className="w-full bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
           />
         </div>
@@ -90,11 +120,34 @@ function HeroSearchBar({ onSearch }: { onSearch: (query: string, date: string) =
         </div>
         <Button
           type="submit"
-          className="h-auto rounded-md bg-primary px-8 py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+          className="h-auto rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90"
         >
           Tìm ngay
         </Button>
       </div>
+
+      {showSuggestions && (suggestionsQuery.data?.length ?? 0) > 0 ? (
+        <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-xl border border-border/70 bg-card shadow-lg">
+          {suggestionsQuery.data?.map((suggestion) => (
+            <button
+              key={`${suggestion.type}-${suggestion.label}-${suggestion.venueId ?? ''}`}
+              type="button"
+              onMouseDown={() => handleSuggestionSelect(suggestion)}
+              className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left hover:bg-muted/60"
+            >
+              <div>
+                <p className="font-medium text-foreground">{suggestion.label}</p>
+                {suggestion.location ? (
+                  <p className="text-sm text-muted-foreground">{suggestion.location}</p>
+                ) : null}
+              </div>
+              <span className="shrink-0 text-xs uppercase tracking-wide text-muted-foreground">
+                {suggestion.type === 'venue' ? 'Cơ sở' : 'Phổ biến'}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
     </form>
   );
 }
@@ -147,7 +200,7 @@ function HeroShowcase() {
       </svg>
 
       <div className="absolute top-6 -left-2 surface-card flex items-center gap-3 px-4 py-3 shadow-md">
-        <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Clock3 className="size-4" />
         </div>
         <div>
@@ -157,7 +210,7 @@ function HeroShowcase() {
       </div>
 
       <div className="absolute top-1/3 -right-2 surface-card flex items-center gap-3 px-4 py-3 shadow-md">
-        <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Trophy className="size-4" />
         </div>
         <div>
@@ -175,17 +228,12 @@ function HeroShowcase() {
           {['17:00', '18:00', '19:00'].map((slot) => (
             <div
               key={slot}
-              className="rounded-md border border-primary/20 bg-primary/5 px-2 py-2 text-center text-xs font-medium text-primary"
+              className="rounded-xl border border-primary/20 bg-primary/5 px-2 py-2 text-center text-xs font-medium text-primary"
             >
               {slot}
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="absolute bottom-20 right-10 inline-flex items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">
-        <Sparkles className="size-3.5" />
-        Xác nhận tức thì
       </div>
     </div>
   );
@@ -193,6 +241,8 @@ function HeroShowcase() {
 
 export function HomePageContent() {
   const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isSessionReady = useAuthStore((state) => state.isSessionReady);
 
   const sportsQuery = useQuery({
     queryKey: ['sports'],
@@ -204,11 +254,31 @@ export function HomePageContent() {
     queryFn: () => getVenues({ limit: 6 }),
   });
 
+  const recentlyViewedQuery = useQuery({
+    queryKey: ['search', 'recently-viewed'],
+    queryFn: getRecentlyViewedVenues,
+    enabled: isSessionReady && isAuthenticated,
+  });
+
   const handleSearch = (query: string, date: string) => {
+    const q = query.trim().toLowerCase();
+    const matchedSport = (sportsQuery.data ?? []).find((sport) => {
+      const name = sport.name.trim().toLowerCase();
+      return name === q || name.includes(q) || q.includes(name);
+    });
+
+    if (matchedSport) {
+      const params = new URLSearchParams({ sport: matchedSport.id });
+      if (date) params.set('date', date);
+      router.push(`/fields?${params.toString()}`);
+      return;
+    }
+
     const params = new URLSearchParams();
     if (query) params.set('search', query);
     if (date) params.set('date', date);
-    router.push(`/fields?${params.toString()}`);
+    const qs = params.toString();
+    router.push(query ? `/venues?${qs}` : date ? `/fields?date=${date}` : '/fields');
   };
 
   const handleSportSelect = (sportId: string | null) => {
@@ -224,7 +294,7 @@ export function HomePageContent() {
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-                Tìm sân phù hợp, đặt lịch và chơi ngay
+                Tìm sân nhanh chóng
               </h1>
               <p className="mt-5 max-w-xl text-lg text-muted-foreground">
                 Khám phá cơ sở thể thao cao cấp, so sánh giá từng sân và giữ chỗ ngay chỉ với vài
@@ -236,7 +306,7 @@ export function HomePageContent() {
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <Button asChild className="rounded-md px-6 py-3">
+                <Button asChild className="rounded-lg px-6 py-3">
                   <Link href="/venues">
                     <Navigation className="size-4" />
                     Sân gần tôi
@@ -267,6 +337,22 @@ export function HomePageContent() {
           />
         </div>
 
+        {recentlyViewedQuery.data && recentlyViewedQuery.data.length > 0 ? (
+          <div className="mb-10">
+            <div className="mb-5">
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Đã xem gần đây</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Tiếp tục khám phá các cơ sở bạn quan tâm
+              </p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {recentlyViewedQuery.data.map((venue: VenueWithFields) => (
+                <VenueCard key={venue.id} venue={venue} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -279,7 +365,7 @@ export function HomePageContent() {
           <Button
             variant="outline"
             asChild
-            className="rounded-md border-primary px-5 py-2 text-primary hover:bg-primary hover:text-primary-foreground"
+            className="rounded-lg border-primary px-5 py-2 text-primary hover:bg-primary hover:text-primary-foreground"
           >
             <Link href="/venues">
               Xem tất cả

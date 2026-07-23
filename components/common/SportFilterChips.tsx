@@ -21,9 +21,9 @@ export function SportFilterChips({
 }: SportFilterChipsProps) {
   if (isLoading) {
     return (
-      <div className={cn('flex gap-3 overflow-x-auto pb-2', className)}>
+      <div className={cn('flex flex-wrap gap-2', className)}>
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="h-11 w-28 animate-pulse rounded-md bg-muted" />
+          <div key={index} className="h-9 w-24 animate-pulse rounded-full bg-muted" />
         ))}
       </div>
     );
@@ -31,10 +31,13 @@ export function SportFilterChips({
 
   if (sports.length === 0) return null;
 
-  const items = [{ id: null, name: 'Tất cả', icon: LayoutGrid }, ...sports.map((s) => ({ ...s, icon: Dumbbell }))];
+  const items = [
+    { id: null, name: 'Tất cả', icon: LayoutGrid },
+    ...sports.map((sport) => ({ ...sport, icon: Dumbbell })),
+  ];
 
   return (
-    <div className={cn('flex gap-3 overflow-x-auto pb-2', className)}>
+    <div className={cn('flex flex-wrap gap-2', className)} role="group" aria-label="Lọc theo môn thể thao">
       {items.map((item) => {
         const active = selectedSportId === item.id || (item.id === null && !selectedSportId);
         const Icon = item.icon;
@@ -44,13 +47,13 @@ export function SportFilterChips({
             type="button"
             onClick={() => onSelect(item.id)}
             className={cn(
-              'flex shrink-0 items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-colors rounded-md',
+              'inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all',
               active
-                ? 'bg-primary text-primary-foreground'
-                : 'border border-border/70 bg-card text-muted-foreground hover:border-primary/30 hover:bg-accent',
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'border border-border/70 bg-card text-muted-foreground hover:border-primary/30 hover:bg-accent hover:text-foreground',
             )}
           >
-            <Icon className="size-4" />
+            <Icon className="size-3.5 shrink-0" />
             {item.name}
           </button>
         );

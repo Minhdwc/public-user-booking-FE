@@ -44,7 +44,7 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md rounded-md border-border/70 shadow-md">
+    <Card className="w-full max-w-md border-border/70 shadow-md">
       <CardHeader className="text-center">
         <div className="mx-auto mb-3 flex items-center justify-center gap-2">
           <Image
@@ -56,9 +56,6 @@ export function LoginForm() {
           <span className="font-bold text-foreground">Minh Đức Booking Sport</span>
         </div>
         <CardTitle className="text-foreground">Đăng nhập</CardTitle>
-        <CardDescription>
-          Duyệt sân tự do — chỉ cần đăng nhập khi đặt sân hoặc quản lý tài khoản
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -85,7 +82,7 @@ export function LoginForm() {
 
           {errors.root ? <p className="text-sm text-destructive">{errors.root.message}</p> : null}
 
-          <Button type="submit" className="w-full rounded-md shadow-sm" disabled={isLoggingIn}>
+          <Button type="submit" className="w-full rounded-lg shadow-sm" disabled={isLoggingIn}>
             {isLoggingIn ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </Button>
 

@@ -13,7 +13,6 @@ import { Label } from '@/components/ui/label';
 import { ApiError } from '@/lib/api/errors';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { buildLoginUrl } from '@/lib/utils/auth-action';
-import { normalizeVnPhone } from '@/lib/utils/phone';
 import { registerSchema, type RegisterFormValues } from '@/lib/validations/auth';
 
 export function RegisterForm() {
@@ -39,13 +38,22 @@ export function RegisterForm() {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
+    const phone = values.phone.trim();
+    const normalizedPhone = phone.startsWith('+84')
+      ? phone
+      : phone.startsWith('84')
+        ? `+${phone}`
+        : phone.startsWith('0')
+          ? `+84${phone.slice(1)}`
+          : phone;
+
     try {
       await registerUser(
         {
           name: values.name,
           username: values.username,
           email: values.email,
-          phone: normalizeVnPhone(values.phone),
+          phone: normalizedPhone,
           password: values.password,
         },
         redirectTo ?? undefined,
@@ -70,7 +78,7 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md rounded-md border-border/70 shadow-md">
+    <Card className="w-full max-w-md border-border/70 shadow-md">
       <CardHeader className="text-center">
         <div className="mx-auto mb-3 flex items-center justify-center gap-2">
           <Image
@@ -150,7 +158,7 @@ export function RegisterForm() {
 
           {errors.root ? <p className="text-sm text-destructive">{errors.root.message}</p> : null}
 
-          <Button type="submit" className="w-full rounded-md shadow-sm" disabled={isRegistering}>
+          <Button type="submit" className="w-full rounded-lg shadow-sm" disabled={isRegistering}>
             {isRegistering ? 'Đang đăng ký...' : 'Đăng ký'}
           </Button>
 

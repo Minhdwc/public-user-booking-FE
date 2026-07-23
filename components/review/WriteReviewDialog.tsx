@@ -21,10 +21,11 @@ import { buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
 interface WriteReviewDialogProps {
-  fieldId: string;
+  venueId: string;
+  returnPath: string;
 }
 
-export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
+export function WriteReviewDialog({ venueId, returnPath }: WriteReviewDialogProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isHydrated = useAuthStore((state) => state.isHydrated);
@@ -32,17 +33,17 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const createMutation = useCreateReview();
-  const eligibilityQuery = useReviewEligibility(fieldId, isHydrated && isAuthenticated);
+  const eligibilityQuery = useReviewEligibility(venueId, isHydrated && isAuthenticated);
 
   const handleOpen = (next: boolean) => {
     if (next && isHydrated && !isAuthenticated) {
       toast.message('Đăng nhập để viết đánh giá');
-      router.push(buildLoginUrl(`/fields/${fieldId}`));
+      router.push(buildLoginUrl(returnPath));
       return;
     }
 
     if (next && eligibilityQuery.data && !eligibilityQuery.data.canReview) {
-      toast.message(eligibilityQuery.data.message ?? 'Bạn chưa thể viết đánh giá cho sân này');
+      toast.message(eligibilityQuery.data.message ?? 'Bạn chưa thể viết đánh giá cho cơ sở này');
       return;
     }
 
@@ -56,7 +57,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
   const handleSubmit = async () => {
     try {
       await createMutation.mutateAsync({
-        fieldId,
+        venueId,
         rating,
         comment: comment.trim() || undefined,
       });
@@ -68,7 +69,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
   };
 
   if (isHydrated && isAuthenticated && eligibilityQuery.isLoading) {
-    return <Skeleton className="h-9 w-28 rounded-md" />;
+    return <Skeleton className="h-9 w-28 rounded-lg" />;
   }
 
   const eligibility = eligibilityQuery.data;
@@ -82,7 +83,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
 
       <Dialog open={open} onOpenChange={handleOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" variant="outline" className="rounded-md" disabled={Boolean(isBlocked)}>
+          <Button size="sm" variant="outline" className="rounded-lg" disabled={Boolean(isBlocked)}>
             Viết đánh giá
           </Button>
         </DialogTrigger>
@@ -91,7 +92,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
             <DialogTitle>Viết đánh giá</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Chia sẻ trải nghiệm của bạn sau khi đã đặt và thanh toán sân thành công.
+            Chia sẻ trải nghiệm của bạn sau khi đã đặt và thanh toán tại cơ sở thành công.
           </p>
 
           <div className="space-y-4">
@@ -105,7 +106,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
                       key={value}
                       type="button"
                       onClick={() => setRating(value)}
-                      className="rounded-md p-1.5 transition-colors hover:bg-accent"
+                      className="rounded-lg p-1.5 transition-colors hover:bg-accent"
                       aria-label={`${value} sao`}
                     >
                       <Star
@@ -130,18 +131,18 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
                 placeholder="Viết nhận xét (không bắt buộc)"
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
-                className="flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                className="flex min-h-24 w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" className="rounded-md" onClick={() => handleOpen(false)}>
+            <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpen(false)}>
               Huỷ
             </Button>
             <Button
               type="button"
-              className="rounded-md"
+              className="rounded-lg"
               disabled={createMutation.isPending}
               onClick={() => void handleSubmit()}
             >

@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { updateProfile, type AccountMe } from '@/lib/api/account';
 import { ApiError } from '@/lib/api/errors';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import { normalizeVnPhone } from '@/lib/utils/phone';
 import { profileSchema, type ProfileFormValues } from '@/lib/validations/account';
 
 interface ProfileFormProps {
@@ -76,10 +75,19 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
   const avatarUrl = useWatch({ control, name: 'avatarUrl' });
 
   const onSubmit = (values: ProfileFormValues) => {
+    const phone = values.phone.trim();
+    const normalizedPhone = phone.startsWith('+84')
+      ? phone
+      : phone.startsWith('84')
+        ? `+${phone}`
+        : phone.startsWith('0')
+          ? `+84${phone.slice(1)}`
+          : phone;
+
     mutation.mutate({
       name: values.name,
       username: values.username,
-      phone: normalizeVnPhone(values.phone),
+      phone: normalizedPhone,
       avatarUrl: values.avatarUrl || undefined,
     });
   };
@@ -119,7 +127,7 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
         </div>
       </div>
 
-      <Button type="submit" className="rounded-md shadow-sm" disabled={mutation.isPending || !isDirty}>
+      <Button type="submit" className="rounded-lg shadow-sm" disabled={mutation.isPending || !isDirty}>
         {mutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
       </Button>
     </form>

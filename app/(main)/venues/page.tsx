@@ -10,10 +10,10 @@ export default function VenuesPage() {
         fallback={
           <div className="space-y-6">
             <Skeleton className="h-12 w-64" />
-            <Skeleton className="h-28 w-full rounded-md" />
+            <Skeleton className="h-28 w-full rounded-lg" />
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
-                <Skeleton key={index} className="h-72 w-full rounded-md" />
+                <Skeleton key={index} className="h-72 w-full rounded-lg" />
               ))}
             </div>
           </div>
