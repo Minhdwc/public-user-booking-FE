@@ -15,9 +15,9 @@ export function FieldInfo({ field }: FieldInfoProps) {
 
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-heading sm:text-4xl">{field.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{field.name}</h1>
           {field.sport?.name ? (
-            <span className="rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-secondary-foreground">
+            <span className="rounded-md bg-secondary px-3 py-1 text-sm font-semibold text-secondary-foreground">
               {field.sport.name}
             </span>
           ) : null}
@@ -39,7 +39,7 @@ export function FieldInfo({ field }: FieldInfoProps) {
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cơ sở</p>
             <Link
               href={`/venues/${field.venue.id}`}
-              className="mt-2 inline-flex items-start gap-2 font-semibold text-heading hover:text-primary"
+              className="mt-2 inline-flex items-start gap-2 font-semibold text-foreground hover:text-primary"
             >
               <MapPin className="mt-0.5 size-4 shrink-0" />
               <span>

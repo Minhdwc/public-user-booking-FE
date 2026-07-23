@@ -20,7 +20,7 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SportBooking — Đặt sân thể thao',
+  title: 'Minh Đức Booking Sport — Đặt sân thể thao',
   description: 'Tìm và đặt sân thể thao trực tuyến',
 };
 

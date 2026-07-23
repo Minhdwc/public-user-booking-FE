@@ -235,7 +235,7 @@ export interface ListParams {
   limit?: number | string;
 }
 
-export interface VenueListParams extends ListParams {}
+export type VenueListParams = ListParams;
 
 export interface FieldListParams extends ListParams {
   venueId?: string;
@@ -293,7 +293,7 @@ export type VenueWithFields = IVenue;
 export type ReviewWithRelations = IReview;
 export type IBookingWithRelations = IBooking;
 
-export interface GetVenuesParams extends VenueListParams {}
+export type GetVenuesParams = VenueListParams;
 
 export interface AccountMe extends IUser {
   permissions?: string[];

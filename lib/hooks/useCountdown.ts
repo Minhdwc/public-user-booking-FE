@@ -16,8 +16,8 @@ export function useCountdown(expiresAt?: string | null) {
 
   useEffect(() => {
     if (!expiresAt) {
-      setRemainingMs(0);
-      return;
+      const timeout = window.setTimeout(() => setRemainingMs(0), 0);
+      return () => window.clearTimeout(timeout);
     }
 
     const tick = () => {

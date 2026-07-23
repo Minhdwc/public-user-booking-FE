@@ -26,11 +26,11 @@ export function ErrorState({
         <AlertCircle className="size-6 text-destructive" />
       </div>
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-heading">{title}</h3>
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
       </div>
       {onRetry ? (
-        <Button variant="outline" className="rounded-full" onClick={onRetry}>
+        <Button variant="outline" className="rounded-md" onClick={onRetry}>
           Thử lại
         </Button>
       ) : null}

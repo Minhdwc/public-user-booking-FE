@@ -32,8 +32,8 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="aspect-video w-full rounded-xl" />
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="aspect-video w-full rounded-md" />
+        <Skeleton className="h-60 w-full rounded-md" />
       </div>
     );
   }
@@ -70,9 +70,9 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
         </div>
       </div>
 
-      <Card className="rounded-2xl border-border/70 shadow-sm">
+      <Card className="rounded-md border-border/70 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-          <CardTitle className="text-heading">Đánh giá từ người chơi</CardTitle>
+          <CardTitle className="text-foreground">Đánh giá từ người chơi</CardTitle>
           <WriteReviewDialog fieldId={fieldId} />
         </CardHeader>
         <CardContent>

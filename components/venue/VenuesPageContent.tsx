@@ -90,7 +90,7 @@ export function VenuesPageContent() {
       {venuesQuery.isLoading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: PAGE_SIZE }).map((_, index) => (
-            <Skeleton key={index} className="aspect-[4/3] w-full rounded-2xl" />
+            <Skeleton key={index} className="h-72 w-full rounded-md" />
           ))}
         </div>
       ) : null}

@@ -142,19 +142,19 @@ function PendingBookingActions({
         <p className="text-sm text-muted-foreground">Đang đồng bộ trạng thái hết hạn...</p>
       )}
       <div className="flex gap-2">
-        <Button asChild variant="outline" className="rounded-full">
+        <Button asChild variant="outline" className="rounded-md">
           <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
         </Button>
         {!isExpired ? (
           <>
             {defaultSavedMethod ? (
-              <Button className="rounded-full" disabled={paying} onClick={() => void continuePayWithSaved()}>
+              <Button className="rounded-md" disabled={paying} onClick={() => void continuePayWithSaved()}>
                 {paying && payingMode === 'saved' ? 'Đang thanh toán...' : 'Thanh toán đã lưu'}
               </Button>
             ) : null}
             <Button
               variant={defaultSavedMethod ? 'outline' : 'default'}
-              className="rounded-full"
+              className="rounded-md"
               disabled={paying}
               onClick={() => void continuePayWithVnpay()}
             >
@@ -163,7 +163,7 @@ function PendingBookingActions({
           </>
         ) : null}
         {canCancel(booking) ? (
-          <Button variant="destructive" className="rounded-full" disabled={cancelPending} onClick={onCancel}>
+          <Button variant="destructive" className="rounded-md" disabled={cancelPending} onClick={onCancel}>
             Hủy lịch
           </Button>
         ) : null}
@@ -242,13 +242,13 @@ export function BookingsPageContent() {
       />
 
       {bookings.length === 0 ? (
-        <Card className="rounded-2xl border-border/70 shadow-sm">
+        <Card className="rounded-md border-border/70 shadow-sm">
           <CardHeader>
             <CardTitle>Chưa có lịch đặt</CardTitle>
             <CardDescription>Hãy tìm sân và đặt khung giờ phù hợp</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="rounded-full">
+            <Button asChild className="rounded-md">
               <Link href="/venues">Tìm sân ngay</Link>
             </Button>
           </CardContent>
@@ -256,7 +256,7 @@ export function BookingsPageContent() {
       ) : (
         <div className="space-y-4">
           {bookings.map((booking: IBookingWithRelations) => (
-            <Card key={booking.id} className="rounded-2xl border-border/70 shadow-sm">
+            <Card key={booking.id} className="rounded-md border-border/70 shadow-sm">
               <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
                 <div className="space-y-1">
                   <CardTitle className="text-lg">{booking.field?.name ?? 'Sân'}</CardTitle>
@@ -300,13 +300,13 @@ export function BookingsPageContent() {
                   />
                 ) : (
                   <div className="flex gap-2">
-                    <Button asChild variant="outline" className="rounded-full">
+                    <Button asChild variant="outline" className="rounded-md">
                       <Link href={`/fields/${booking.fieldId}`}>Xem sân</Link>
                     </Button>
                     {canCancel(booking) ? (
                       <Button
                         variant="destructive"
-                        className="rounded-full"
+                        className="rounded-md"
                         disabled={cancelMutation.isPending}
                         onClick={() => cancelMutation.mutate(booking.id)}
                       >

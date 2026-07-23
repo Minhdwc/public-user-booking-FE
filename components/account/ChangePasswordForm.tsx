@@ -69,7 +69,7 @@ export function ChangePasswordForm() {
         ) : null}
       </div>
 
-      <Button type="submit" className="rounded-full shadow-sm" disabled={mutation.isPending}>
+      <Button type="submit" className="rounded-md shadow-sm" disabled={mutation.isPending}>
         {mutation.isPending ? 'Đang đổi...' : 'Đổi mật khẩu'}
       </Button>
     </form>

@@ -1,15 +1,17 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import * as authApi from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
+import { favoriteKeys } from '@/lib/queries/favorites.query';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { getSafeRedirectPath } from '@/lib/utils/redirect';
 
 export function useAuth() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const setAuth = useAuthStore((state) => state.setAuth);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
@@ -20,6 +22,7 @@ export function useAuth() {
   const login = async (payload: authApi.LoginPayload, redirectTo?: string) => {
     const data = await loginMutation.mutateAsync(payload);
     setAuth(data.user, data.accessToken, data.refreshToken);
+    await queryClient.invalidateQueries({ queryKey: favoriteKeys.summary() });
     toast.success('Đăng nhập thành công');
     router.replace(getSafeRedirectPath(redirectTo));
     return data;
@@ -28,6 +31,7 @@ export function useAuth() {
   const register = async (payload: authApi.RegisterPayload, redirectTo?: string) => {
     const data = await registerMutation.mutateAsync(payload);
     setAuth(data.user, data.accessToken, data.refreshToken);
+    await queryClient.invalidateQueries({ queryKey: favoriteKeys.summary() });
     toast.success('Đăng ký thành công');
     router.replace(getSafeRedirectPath(redirectTo));
     return data;
@@ -38,6 +42,7 @@ export function useAuth() {
       await logoutMutation.mutateAsync();
     } finally {
       clearAuth();
+      queryClient.removeQueries({ queryKey: favoriteKeys.all });
       toast.success('Đã đăng xuất');
       router.replace('/login');
     }

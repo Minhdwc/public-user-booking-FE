@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function PaymentsPage() {
   return (
     <PageShell size="sm">
-      <Suspense fallback={<Skeleton className="h-48 w-full rounded-2xl" />}>
+      <Suspense fallback={<Skeleton className="h-48 w-full rounded-md" />}>
         <PaymentsResultContent />
       </Suspense>
     </PageShell>

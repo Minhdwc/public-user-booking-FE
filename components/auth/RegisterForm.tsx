@@ -1,8 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import logoSquare from '@/assets/logo/logo-9-9.png';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,9 +70,18 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md rounded-2xl border-border/70 shadow-md">
+    <Card className="w-full max-w-md rounded-md border-border/70 shadow-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-heading">Đăng ký</CardTitle>
+        <div className="mx-auto mb-3 flex items-center justify-center gap-2">
+          <Image
+            src={logoSquare}
+            alt="Minh Đức Booking Sport"
+            className="size-8 rounded-lg object-cover"
+            priority
+          />
+          <span className="font-bold text-foreground">Minh Đức Booking Sport</span>
+        </div>
+        <CardTitle className="text-foreground">Đăng ký</CardTitle>
         <CardDescription>Tạo tài khoản để bắt đầu đặt sân</CardDescription>
       </CardHeader>
       <CardContent>
@@ -139,7 +150,7 @@ export function RegisterForm() {
 
           {errors.root ? <p className="text-sm text-destructive">{errors.root.message}</p> : null}
 
-          <Button type="submit" className="w-full rounded-full shadow-sm" disabled={isRegistering}>
+          <Button type="submit" className="w-full rounded-md shadow-sm" disabled={isRegistering}>
             {isRegistering ? 'Đang đăng ký...' : 'Đăng ký'}
           </Button>
 

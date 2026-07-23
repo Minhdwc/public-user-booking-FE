@@ -40,11 +40,11 @@ html.dark {
 
 @layer components {
   .surface-card {
-    @apply rounded-2xl border border-border/70 bg-card shadow-sm;
+    @apply rounded-md border border-border/70 bg-card shadow-sm;
   }
 
   .surface-muted {
-    @apply rounded-2xl border border-border/60 bg-muted/50;
+    @apply rounded-md border border-border/60 bg-muted/50;
   }
 
   .hero-gradient {
@@ -70,7 +70,7 @@ html.dark {
   }
 
   .status-badge {
-    @apply rounded-full px-2.5 py-1 text-xs font-medium;
+    @apply rounded-md px-2.5 py-1 text-xs font-medium;
   }
 
   .status-pending {
@@ -87,6 +87,49 @@ html.dark {
 
   .status-completed {
     @apply bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-200;
+  }
+
+  .custom-leaflet-div-icon {
+    background: transparent;
+    border: none;
+  }
+
+  .price-marker {
+    @apply relative inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-bold shadow-md;
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
+    border: 1px solid hsl(var(--foreground));
+  }
+
+  .price-marker-favorite {
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 3px hsl(var(--primary));
+  }
+
+  .price-marker-active {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-color: hsl(var(--primary));
+  }
+
+  .price-marker-active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px 5px 0;
+    border-style: solid;
+    border-color: hsl(var(--primary)) transparent transparent transparent;
+  }
+
+  .user-location-marker {
+    @apply relative flex size-6 items-center justify-center;
+  }
+
+  .user-location-marker-dot {
+    @apply size-3 rounded-full bg-sky-500 ring-4 ring-sky-500/25;
   }
 }
 

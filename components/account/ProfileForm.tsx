@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -27,7 +27,7 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     reset,
     setError,
     formState: { errors, isDirty },
@@ -73,7 +73,7 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
     },
   });
 
-  const avatarUrl = watch('avatarUrl');
+  const avatarUrl = useWatch({ control, name: 'avatarUrl' });
 
   const onSubmit = (values: ProfileFormValues) => {
     mutation.mutate({
@@ -119,7 +119,7 @@ export function ProfileForm({ account, onUpdated }: ProfileFormProps) {
         </div>
       </div>
 
-      <Button type="submit" className="rounded-full shadow-sm" disabled={mutation.isPending || !isDirty}>
+      <Button type="submit" className="rounded-md shadow-sm" disabled={mutation.isPending || !isDirty}>
         {mutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
       </Button>
     </form>

@@ -68,7 +68,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
   };
 
   if (isHydrated && isAuthenticated && eligibilityQuery.isLoading) {
-    return <Skeleton className="h-9 w-28 rounded-full" />;
+    return <Skeleton className="h-9 w-28 rounded-md" />;
   }
 
   const eligibility = eligibilityQuery.data;
@@ -82,7 +82,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
 
       <Dialog open={open} onOpenChange={handleOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" variant="outline" className="rounded-full" disabled={Boolean(isBlocked)}>
+          <Button size="sm" variant="outline" className="rounded-md" disabled={Boolean(isBlocked)}>
             Viết đánh giá
           </Button>
         </DialogTrigger>
@@ -105,7 +105,7 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
                       key={value}
                       type="button"
                       onClick={() => setRating(value)}
-                      className="rounded-full p-1.5 transition-colors hover:bg-accent"
+                      className="rounded-md p-1.5 transition-colors hover:bg-accent"
                       aria-label={`${value} sao`}
                     >
                       <Star
@@ -130,18 +130,18 @@ export function WriteReviewDialog({ fieldId }: WriteReviewDialogProps) {
                 placeholder="Viết nhận xét (không bắt buộc)"
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
-                className="flex min-h-[96px] w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                className="flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" className="rounded-full" onClick={() => handleOpen(false)}>
+            <Button type="button" variant="outline" className="rounded-md" onClick={() => handleOpen(false)}>
               Huỷ
             </Button>
             <Button
               type="button"
-              className="rounded-full"
+              className="rounded-md"
               disabled={createMutation.isPending}
               onClick={() => void handleSubmit()}
             >

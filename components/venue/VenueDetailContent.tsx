@@ -23,8 +23,8 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="aspect-video w-full rounded-2xl" />
-        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="aspect-video w-full rounded-md" />
+        <Skeleton className="h-40 w-full rounded-md" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
         <BackLink href="/venues" label="Quay lại danh sách cơ sở" />
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cơ sở</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-heading sm:text-4xl">{data.name}</h1>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{data.name}</h1>
           <p className="mt-3 flex items-start gap-2 text-muted-foreground">
             <MapPin className="mt-0.5 size-4 shrink-0" />
             {data.location}
@@ -63,7 +63,7 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
 
       <section className="space-y-5">
         <div>
-          <h2 className="text-xl font-bold text-heading">Danh sách sân</h2>
+          <h2 className="text-xl font-bold text-foreground">Danh sách sân</h2>
           <p className="text-sm text-muted-foreground">{data.fields?.length ?? 0} sân đang hoạt động</p>
         </div>
 

@@ -5,7 +5,7 @@ type PageShellSize = 'sm' | 'md' | 'lg';
 const sizeClass: Record<PageShellSize, string> = {
   sm: 'max-w-3xl',
   md: 'max-w-4xl',
-  lg: 'max-w-6xl',
+  lg: 'max-w-7xl',
 };
 
 interface PageShellProps {

@@ -39,10 +39,10 @@ export function SearchBar({
           name="search"
           defaultValue={defaultValue}
           placeholder={placeholder}
-          className="h-11 rounded-xl border-border/70 bg-card pl-10 shadow-sm"
+          className="h-11 rounded-md border-border/70 bg-card pl-10 shadow-sm"
         />
       </div>
-      <Button type="submit" className="h-11 rounded-xl px-6 shadow-sm">
+      <Button type="submit" className="h-11 rounded-md px-6 shadow-sm">
         {submitLabel}
       </Button>
     </form>

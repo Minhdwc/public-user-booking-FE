@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createBooking } from '@/lib/api/bookings';
@@ -46,6 +45,28 @@ function todayLocalIsoDate() {
   return `${year}-${month}-${day}`;
 }
 
+const weekdayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+function next7Days() {
+  const now = new Date();
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() + i);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const value = `${year}-${month}-${day}`;
+    days.push({
+      value,
+      weekday: weekdayLabels[date.getDay()],
+      dayMonth: `${date.getDate()}/${date.getMonth() + 1}`,
+      isToday: i === 0,
+    });
+  }
+  return days;
+}
+
 function formatSlotTime(value: string) {
   const match = value.match(/T(\d{2}:\d{2})/);
   if (match) return match[1];
@@ -75,8 +96,13 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   const [selectedMethodId, setSelectedMethodId] = useState<string>('');
 
   useEffect(() => {
-    if (draftDate) setDate(draftDate);
-    if (draftTimeslotId) setSelectedTimeslotId(draftTimeslotId);
+    if (draftDate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDate(draftDate);
+    }
+    if (draftTimeslotId) {
+      setSelectedTimeslotId(draftTimeslotId);
+    }
   }, [draftDate, draftTimeslotId]);
 
   const savedMethodsQuery = useQuery({
@@ -87,10 +113,11 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
 
   const savedMethods = savedMethodsQuery.data ?? [];
   const defaultMethod =
-    savedMethods.find((method) => method.isDefault) ?? savedMethods[0] ?? null;
+    savedMethods.find((method: IUserPaymentMethod) => method.isDefault) ?? savedMethods[0] ?? null;
 
   useEffect(() => {
     if (defaultMethod && !selectedMethodId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedMethodId(defaultMethod.id);
     }
     if (savedMethods.length === 0) {
@@ -171,7 +198,10 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
     },
   });
 
-  const timeslots = availabilityQuery.data?.timeslots ?? [];
+  const timeslots = useMemo(
+    () => availabilityQuery.data?.timeslots ?? [],
+    [availabilityQuery.data?.timeslots],
+  );
   const selectedSlot = useMemo(
     () => timeslots.find((slot: ITimeslot) => slot.id === selectedTimeslotId) ?? null,
     [selectedTimeslotId, timeslots],
@@ -228,7 +258,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   })();
 
   return (
-    <Card className="rounded-2xl border-border/70 shadow-sm">
+    <Card className="rounded-md border-border/70 shadow-sm">
       <CardHeader>
         <CardTitle>Đặt sân</CardTitle>
         <CardDescription>
@@ -240,17 +270,45 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="booking-date">Ngày chơi</Label>
-          <Input
-            id="booking-date"
-            type="date"
-            min={todayLocalIsoDate()}
-            value={date}
-            onChange={(event) => {
-              setDate(event.target.value);
-              setSelectedTimeslotId(null);
-            }}
-          />
+          <Label>Ngày chơi</Label>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {next7Days().map((day) => {
+              const selected = day.value === date;
+              return (
+                <button
+                  key={day.value}
+                  type="button"
+                  onClick={() => {
+                    setDate(day.value);
+                    setSelectedTimeslotId(null);
+                  }}
+                  className={cn(
+                    'shrink-0 rounded-md border px-3 py-2 text-left transition-colors',
+                    selected
+                      ? 'chip-active border-primary'
+                      : 'border-border bg-card hover:border-primary/50 hover:bg-muted',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'block text-xs uppercase',
+                      selected ? 'text-primary-foreground' : 'text-muted-foreground',
+                    )}
+                  >
+                    {day.isToday ? 'Hôm nay' : day.weekday}
+                  </span>
+                  <span
+                    className={cn(
+                      'block text-sm font-semibold',
+                      selected ? 'text-primary-foreground' : 'text-foreground',
+                    )}
+                  >
+                    {day.dayMonth}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -316,7 +374,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
                       onChange={(event) => setSelectedMethodId(event.target.value)}
                       className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                     >
-                      {savedMethods.map((method) => (
+                      {savedMethods.map((method: IUserPaymentMethod) => (
                         <option key={method.id} value={method.id}>
                           {formatSavedMethod(method)}
                           {method.isDefault ? ' (mặc định)' : ''}
@@ -362,7 +420,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
         </div>
 
         <Button
-          className="w-full rounded-full shadow-sm"
+          className="w-full rounded-md shadow-sm"
           disabled={createMutation.isPending || availabilityQuery.isLoading || !isHydrated}
           onClick={handleSubmit}
         >

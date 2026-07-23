@@ -6,6 +6,11 @@ export function formatPrice(price: number) {
   }).format(price);
 }
 
+export function formatShortPrice(price: number) {
+  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1)}tr`;
+  return `${Math.round(price / 1000)}k`;
+}
+
 export function formatDate(date: string) {
   return new Intl.DateTimeFormat('vi-VN', {
     day: '2-digit',

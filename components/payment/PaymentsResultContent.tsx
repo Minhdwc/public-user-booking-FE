@@ -89,9 +89,9 @@ export function PaymentsResultContent() {
     const booking = paymentQuery.data?.booking;
 
     return (
-      <Card className="rounded-2xl border-border/70 shadow-sm">
+      <Card className="rounded-md border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-heading">Thanh toán thành công</CardTitle>
+          <CardTitle className="text-foreground">Thanh toán thành công</CardTitle>
           <CardDescription>
             Đặt sân đã được xác nhận. Email xác nhận sẽ được gửi sau khi thanh toán thành công.
           </CardDescription>
@@ -139,9 +139,9 @@ export function PaymentsResultContent() {
 
   if (status === 'failed') {
     return (
-      <Card className="rounded-2xl border-border/70 shadow-sm">
+      <Card className="rounded-md border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-heading">Thanh toán thất bại</CardTitle>
+          <CardTitle className="text-foreground">Thanh toán thất bại</CardTitle>
           <CardDescription>
             Bạn có thể thử lại với cùng giao dịch đang chờ — không tạo thanh toán mới.
           </CardDescription>
@@ -169,9 +169,9 @@ export function PaymentsResultContent() {
           : 'Không tìm thấy thanh toán';
 
     return (
-      <Card className="rounded-2xl border-border/70 shadow-sm">
+      <Card className="rounded-md border-border/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-heading">{title}</CardTitle>
+          <CardTitle className="text-foreground">{title}</CardTitle>
           <CardDescription>
             Có lỗi kỹ thuật khi xác nhận thanh toán. Vui lòng liên hệ hỗ trợ và cung cấp mã giao dịch
             nếu có.
@@ -187,9 +187,9 @@ export function PaymentsResultContent() {
   }
 
   return (
-    <Card className="rounded-2xl border-border/70 shadow-sm">
+    <Card className="rounded-md border-border/70 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-heading">Kết quả thanh toán</CardTitle>
+        <CardTitle className="text-foreground">Kết quả thanh toán</CardTitle>
         <CardDescription>
           Không xác định được trạng thái từ URL. Kiểm tra lại lịch đặt sân.
         </CardDescription>
