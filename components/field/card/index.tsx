@@ -12,16 +12,11 @@ interface FieldCardProps {
   onHover?: (fieldId: string | null) => void;
 }
 
-function getMockRating(fieldId: string) {
-  const hash = fieldId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const rating = 4 + (hash % 10) / 10;
-  const reviewCount = 50 + (hash % 200);
-  return { rating, reviewCount };
-}
-
 export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
   const coverImage = field.images?.[0];
-  const { rating, reviewCount } = getMockRating(field.id);
+  const ratingAverage = field.venue?.ratingAverage;
+  const ratingCount = field.venue?.ratingCount ?? 0;
+  const hasRating = ratingAverage != null && ratingCount > 0;
 
   return (
     <Link
@@ -76,11 +71,15 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-border/50 pt-3">
-          <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600">
-            <Star className="size-4 fill-amber-400 text-amber-400" />
-            {rating.toFixed(1)}
-            <span className="text-xs font-normal text-muted-foreground">({reviewCount})</span>
-          </span>
+          {hasRating ? (
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600">
+              <Star className="size-4 fill-amber-400 text-amber-400" />
+              {ratingAverage.toFixed(1)}
+              <span className="text-xs font-normal text-muted-foreground">({ratingCount})</span>
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">Chưa có đánh giá</span>
+          )}
 
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors group-hover:bg-primary/90">
             Đặt sân
