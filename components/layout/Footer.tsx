@@ -38,7 +38,7 @@ export function Footer() {
           <p className="text-sm font-semibold uppercase tracking-wide text-white">Khám phá</p>
           <ul className="mt-5 space-y-3 text-sm text-primary-foreground/70">
             <li>
-              <Link href="/fields" className="inline-flex items-center gap-2 hover:text-white">
+              <Link href="/courts" className="inline-flex items-center gap-2 hover:text-white">
                 <LayoutGrid className="size-3.5" />
                 Danh sách sân
               </Link>

@@ -25,10 +25,16 @@ function formatBookingDate(value: string) {
   return date.toLocaleDateString('vi-VN');
 }
 
-export function PaymentsResultContent() {
+type BookingResultStatus = 'success' | 'failed' | 'amount_mismatch' | 'invalid' | 'not_found';
+
+interface PaymentsResultContentProps {
+  forcedStatus?: BookingResultStatus;
+}
+
+export function PaymentsResultContent({ forcedStatus }: PaymentsResultContentProps) {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const status = searchParams.get('status') ?? '';
+  const status = forcedStatus || searchParams.get('status');
   const paymentId = searchParams.get('paymentId');
   const [retrying, setRetrying] = useState(false);
   const toastedRef = useRef(false);
@@ -103,34 +109,38 @@ export function PaymentsResultContent() {
             (() => {
               const primaryItem = booking.items?.[0];
               return (
-            <div className="space-y-1 text-sm">
-              <p>
-                Sân: <span className="font-medium">{primaryItem?.field?.name ?? '—'}</span>
-              </p>
-              <p>
-                Cơ sở: <span className="font-medium">{primaryItem?.field?.venue?.name ?? '—'}</span>
-              </p>
-              <p>
-                Ngày:{' '}
-                <span className="font-medium">
-                  {primaryItem ? formatBookingDate(primaryItem.date) : '—'}
-                </span>
-              </p>
-              <p>
-                Giờ:{' '}
-                <span className="font-medium">
-                  {primaryItem
-                    ? `${formatSlotTime(primaryItem.startTime)}–${formatSlotTime(primaryItem.endTime)}`
-                    : '—'}
-                </span>
-              </p>
-              <p>
-                Số tiền:{' '}
-                <span className="font-medium">
-                  {(paymentQuery.data?.amount ?? booking.finalAmount ?? 0).toLocaleString('vi-VN')} đ
-                </span>
-              </p>
-            </div>
+                <div className="space-y-1 text-sm">
+                  <p>
+                    Sân: <span className="font-medium">{primaryItem?.court?.name ?? '—'}</span>
+                  </p>
+                  <p>
+                    Cơ sở:{' '}
+                    <span className="font-medium">{primaryItem?.court?.venue?.name ?? '—'}</span>
+                  </p>
+                  <p>
+                    Ngày:{' '}
+                    <span className="font-medium">
+                      {primaryItem ? formatBookingDate(primaryItem.date) : '—'}
+                    </span>
+                  </p>
+                  <p>
+                    Giờ:{' '}
+                    <span className="font-medium">
+                      {primaryItem
+                        ? `${formatSlotTime(primaryItem.startTime)}–${formatSlotTime(primaryItem.endTime)}`
+                        : '—'}
+                    </span>
+                  </p>
+                  <p>
+                    Số tiền:{' '}
+                    <span className="font-medium">
+                      {(paymentQuery.data?.amount ?? booking.finalAmount ?? 0).toLocaleString(
+                        'vi-VN',
+                      )}{' '}
+                      đ
+                    </span>
+                  </p>
+                </div>
               );
             })()
           ) : (
@@ -181,8 +191,8 @@ export function PaymentsResultContent() {
         <CardHeader>
           <CardTitle className="text-foreground">{title}</CardTitle>
           <CardDescription>
-            Có lỗi kỹ thuật khi xác nhận thanh toán. Vui lòng liên hệ hỗ trợ và cung cấp mã giao dịch
-            nếu có.
+            Có lỗi kỹ thuật khi xác nhận thanh toán. Vui lòng liên hệ hỗ trợ và cung cấp mã giao
+            dịch nếu có.
           </CardDescription>
         </CardHeader>
         <CardContent>

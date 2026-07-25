@@ -9,7 +9,7 @@ export async function listNotifications(): Promise<INotification[]> {
 }
 
 export async function getUnreadNotificationCount(): Promise<number> {
-  return (await notificationService.getUnreadCount()).count;
+  return notificationService.getUnreadCount();
 }
 
 export async function markNotificationRead(id: string): Promise<INotification> {

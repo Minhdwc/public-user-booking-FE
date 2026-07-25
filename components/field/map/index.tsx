@@ -2,10 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import type { VenueMapPoint } from '@/components/field/map/venue-marker-dialog';
-import type { Field, Sport } from '@/lib/api/types';
+import type { ICourtWithSport } from '@/lib/api/types';
 
 interface MapViewProps {
-  fields: (Field & { sport: Sport })[];
+  fields: ICourtWithSport[];
   selectedFieldId?: string | null;
   favoriteVenueIds?: string[];
   onSelectField?: (fieldId: string) => void;

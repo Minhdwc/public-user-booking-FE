@@ -1,24 +1,20 @@
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 import { FavoriteButton } from '@/components/common/FavoriteButton';
-import type { VenueWithFields } from '@/lib/api/types';
+import { IVenue } from '@/lib/api/types';
 import { formatPrice } from '@/lib/utils/format';
 import { ImagePlaceholder } from '@/components/common/ImagePlaceholder';
 
-interface VenueCardProps {
-  venue: VenueWithFields;
-}
-
-export function VenueCard({ venue }: VenueCardProps) {
+export function VenueCard({ venue }: { venue: IVenue }) {
   const coverImage = venue.images?.[0];
-  const fields = venue.fields ?? [];
+  const courts = venue.courts ?? [];
   const sports = Array.from(
     new Map(
-      fields.filter((field) => field.sport).map((field) => [field.sport!.id, field.sport!.name]),
+      courts.filter((court) => court.sport).map((court) => [court.sport!.id, court.sport!.name]),
     ).entries(),
   ).map(([id, name]) => ({ id, name }));
-  const minPrice = fields.length ? Math.min(...fields.map((field) => field.price)) : null;
-  const amenities = venue.amenities ?? [];
+  const minPrice = courts.length ? Math.min(...courts.map((court) => court.basePriceVnd)) : null;
+  const amenities = venue.amenities || [];
 
   return (
     <Link href={`/venues/${venue.id}`} className="group block h-full">
@@ -44,7 +40,8 @@ export function VenueCard({ venue }: VenueCardProps) {
 
           {minPrice !== null ? (
             <div className="absolute bottom-3 left-3 rounded-lg border border-white/20 bg-white/90 px-3 py-1.5 text-sm font-semibold text-foreground backdrop-blur-sm">
-              {formatPrice(minPrice)} <span className="text-xs font-normal text-muted-foreground">/giờ</span>
+              {formatPrice(minPrice)}{' '}
+              <span className="text-xs font-normal text-muted-foreground">/giờ</span>
             </div>
           ) : null}
         </div>
@@ -71,7 +68,7 @@ export function VenueCard({ venue }: VenueCardProps) {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">
-                {venue.fields?.length ?? 0} sân
+                {venue.courts?.length ?? 0} sân
               </span>
               {amenities.slice(0, 2).map((amenity) => (
                 <span

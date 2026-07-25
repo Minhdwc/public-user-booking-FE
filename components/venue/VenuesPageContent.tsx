@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getSports } from '@/lib/api/sports';
 import { getVenues } from '@/lib/api/venues';
 import { searchVenuesList } from '@/lib/api/search';
+import { IVenue } from '@/lib/api/types';
 
 const PAGE_SIZE = 9;
 
@@ -61,7 +62,7 @@ export function VenuesPageContent() {
 
     const params = new URLSearchParams({ sport: matchedSport.id });
     if (date) params.set('date', date);
-    router.replace(`/fields?${params.toString()}`);
+    router.replace(`/courts?${params.toString()}`);
   }, [date, router, search, sportsQuery.data]);
 
   const venuesQuery = useQuery({
@@ -77,8 +78,8 @@ export function VenuesPageContent() {
   const filteredVenues = useMemo(() => {
     const venues = venuesQuery.data ?? [];
     if (!sportId) return venues;
-    return venues.filter((venue) =>
-      (venue.fields ?? []).some((field) => field.sportId === sportId),
+    return venues.filter((venue: IVenue) =>
+      (venue.courts ?? []).some((court) => court.sportId === sportId),
     );
   }, [venuesQuery.data, sportId]);
 
@@ -101,7 +102,7 @@ export function VenuesPageContent() {
             if (matchedSport) {
               const params = new URLSearchParams({ sport: matchedSport.id });
               if (date) params.set('date', date);
-              router.push(`/fields?${params.toString()}`);
+              router.push(`/courts?${params.toString()}`);
               return;
             }
 
@@ -159,7 +160,7 @@ export function VenuesPageContent() {
       {filteredVenues.length > 0 ? (
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVenues.map((venue) => (
+            {filteredVenues.map((venue: IVenue) => (
               <VenueCard key={venue.id} venue={venue} />
             ))}
           </div>

@@ -1,45 +1,31 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createBooking } from '@/lib/api/bookings';
-import { createVnpayUrl, getOrCreatePendingPayment, payWithSavedMethod } from '@/lib/api/payments';
+import { getCourtAvailability } from '@/lib/api/courts';
 import { ApiError } from '@/lib/api/errors';
-import { getFieldAvailability } from '@/lib/api/fields';
-import { unwrapList } from '@/lib/api/response';
-import { IAvailabilitySlot, IUserPaymentMethod } from '@/lib/api/types';
-import { userPaymentMethodService } from '@/lib/service';
+import { IAvailabilitySlot } from '@/lib/api/types';
 import { useAuthStore } from '@/lib/stores/auth-store';
-import { buildFieldBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
+import { buildCourtBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
 import { cn } from '@/lib/utils';
 
 interface BookingPanelProps {
-  fieldId: string;
-  fieldName: string;
-  price: number;
+  courtId: string;
+  courtName: string;
+  basePriceVnd: number;
 }
-
-type SubmitPhase = 'idle' | 'holding' | 'paying';
-type CheckoutMode = 'saved' | 'vnpay';
 
 type SelectedSlot = {
   startTime: string;
   endTime: string;
   subtotal: number;
-};
-
-const methodLabels: Record<IUserPaymentMethod['type'], string> = {
-  bank_transfer: 'Chuyển khoản',
-  momo: 'MoMo',
-  zalopay: 'ZaloPay',
-  vnpay: 'VNPay',
 };
 
 function todayLocalIsoDate() {
@@ -83,12 +69,7 @@ function slotKey(slot: SelectedSlot) {
   return `${slot.startTime}|${slot.endTime}`;
 }
 
-function formatSavedMethod(method: IUserPaymentMethod) {
-  const parts = [method.provider, method.maskedNumber].filter(Boolean);
-  return parts.join(' · ') || methodLabels[method.type];
-}
-
-export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
+export function BookingPanel({ courtId, courtName, basePriceVnd }: BookingPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -99,130 +80,59 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   const draftStartTime = searchParams.get('startTime');
   const draftEndTime = searchParams.get('endTime');
 
-  const [date, setDate] = useState(draftDate || todayLocalIsoDate());
-  const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(
+  const urlDate = draftDate || todayLocalIsoDate();
+  const urlSelectedSlot: SelectedSlot | null =
     draftStartTime && draftEndTime
-      ? { startTime: draftStartTime, endTime: draftEndTime, subtotal: price }
-      : null,
-  );
-  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
-  const [checkoutMode, setCheckoutMode] = useState<CheckoutMode>('saved');
-  const [selectedMethodId, setSelectedMethodId] = useState<string>('');
+      ? { startTime: draftStartTime, endTime: draftEndTime, subtotal: basePriceVnd }
+      : null;
 
-  useEffect(() => {
-    if (draftDate) {
-      setDate(draftDate);
-    }
-    if (draftStartTime && draftEndTime) {
-      setSelectedSlot({ startTime: draftStartTime, endTime: draftEndTime, subtotal: price });
-    }
-  }, [draftDate, draftEndTime, draftStartTime, price]);
+  const [dateOverride, setDateOverride] = useState<string | null>(null);
+  const [slotOverride, setSlotOverride] = useState<SelectedSlot | null | undefined>(undefined);
 
-  const savedMethodsQuery = useQuery({
-    queryKey: ['user-payment-methods'],
-    queryFn: async () => unwrapList(await userPaymentMethodService.getMethods({ limit: 50 })),
-    enabled: isHydrated && isAuthenticated,
-  });
-
-  const savedMethods = savedMethodsQuery.data ?? [];
-  const defaultMethod =
-    savedMethods.find((method: IUserPaymentMethod) => method.isDefault) ?? savedMethods[0] ?? null;
-
-  useEffect(() => {
-    if (defaultMethod && !selectedMethodId) {
-      setSelectedMethodId(defaultMethod.id);
-    }
-    if (savedMethods.length === 0) {
-      setCheckoutMode('vnpay');
-    }
-  }, [defaultMethod, savedMethods.length, selectedMethodId]);
+  const date = dateOverride ?? urlDate;
+  const selectedSlot = slotOverride !== undefined ? slotOverride : urlSelectedSlot;
 
   const availabilityQuery = useQuery({
-    queryKey: ['fields', fieldId, 'availability', date],
-    queryFn: () => getFieldAvailability(fieldId, date),
-    enabled: Boolean(fieldId && date),
+    queryKey: ['courts', courtId, 'availability', date],
+    queryFn: () => getCourtAvailability(courtId, date),
+    enabled: Boolean(courtId && date),
   });
 
   const createMutation = useMutation({
     mutationFn: async (payload: {
-      fieldId: string;
+      courtId: string;
       date: string;
       startTime: string;
       endTime: string;
-      mode: CheckoutMode;
-      userPaymentMethodId?: string;
-    }) => {
-      setSubmitPhase('holding');
-      const booking = await createBooking({
+    }) =>
+      createBooking({
         items: [
           {
-            fieldId: payload.fieldId,
+            courtId: payload.courtId,
             date: payload.date,
             startTime: formatSlotTime(payload.startTime),
             endTime: formatSlotTime(payload.endTime),
           },
         ],
-      });
-
-      try {
-        setSubmitPhase('paying');
-        const payment = await getOrCreatePendingPayment(booking.id);
-
-        if (payload.mode === 'saved') {
-          const result = await payWithSavedMethod(payment.id, payload.userPaymentMethodId);
-          return { ok: true as const, mode: 'saved' as const, paymentId: result.paymentId };
-        }
-
-        const { paymentUrl } = await createVnpayUrl(payment.id);
-        return { ok: true as const, mode: 'vnpay' as const, paymentUrl };
-      } catch (error) {
-        toast.error(
-          error instanceof ApiError
-            ? error.message
-            : 'Đã giữ chỗ nhưng chưa thanh toán được, vào Lịch đặt sân để thử lại',
-        );
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ['fields', fieldId, 'availability'] }),
-          queryClient.invalidateQueries({ queryKey: ['bookings'] }),
-        ]);
-        router.push('/bookings');
-        return { ok: false as const };
-      }
-    },
-    onSuccess: async (result) => {
-      if (!result.ok) {
-        setSubmitPhase('idle');
-        return;
-      }
-
+      }),
+    onSuccess: async (booking) => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['fields', fieldId, 'availability'] }),
+        queryClient.invalidateQueries({ queryKey: ['courts', courtId, 'availability'] }),
         queryClient.invalidateQueries({ queryKey: ['bookings'] }),
       ]);
-
-      if (result.mode === 'saved') {
-        toast.success('Thanh toán thành công');
-        router.push(`/payments?status=success&paymentId=${result.paymentId}`);
-        return;
-      }
-
-      toast.message('Đang chuyển đến VNPay...');
-      window.location.href = result.paymentUrl;
+      toast.success('Đã giữ chỗ — chuyển đến thanh toán');
+      router.push(`/checkout?bookingId=${booking.id}`);
     },
     onError: (error) => {
-      setSubmitPhase('idle');
       const message = error instanceof ApiError ? error.message : 'Không thể đặt sân';
       toast.error(message);
     },
   });
 
-  const slots = useMemo(
-    () => availabilityQuery.data?.slots ?? [],
-    [availabilityQuery.data?.slots],
-  );
+  const slots = useMemo(() => availabilityQuery.data?.slots ?? [], [availabilityQuery.data?.slots]);
 
   const handleSelectSlot = (slot: IAvailabilitySlot) => {
-    setSelectedSlot({
+    setSlotOverride({
       startTime: slot.startTime,
       endTime: slot.endTime,
       subtotal: slot.subtotal,
@@ -230,7 +140,7 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
   };
 
   const goLoginToContinue = () => {
-    const returnPath = buildFieldBookingReturnPath(fieldId, {
+    const returnPath = buildCourtBookingReturnPath(courtId, {
       date,
       startTime: selectedSlot ? formatSlotTime(selectedSlot.startTime) : undefined,
       endTime: selectedSlot ? formatSlotTime(selectedSlot.endTime) : undefined,
@@ -252,39 +162,32 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
       return;
     }
 
-    if (checkoutMode === 'saved' && !selectedMethodId) {
-      toast.error('Chọn phương thức thanh toán đã lưu hoặc chuyển sang VNPay');
-      return;
-    }
-
     createMutation.mutate({
-      fieldId,
+      courtId,
       date,
       startTime: selectedSlot.startTime,
       endTime: selectedSlot.endTime,
-      mode: checkoutMode,
-      userPaymentMethodId: checkoutMode === 'saved' ? selectedMethodId : undefined,
     });
   };
 
+  const holdMinutes = 10;
+
   const buttonLabel = (() => {
     if (!isHydrated) return 'Đang tải...';
-    if (submitPhase === 'holding') return 'Đang giữ chỗ...';
-    if (submitPhase === 'paying' || createMutation.isPending) {
-      return checkoutMode === 'saved' ? 'Đang thanh toán...' : 'Đang chuyển đến VNPay...';
-    }
+    if (createMutation.isPending) return 'Đang giữ chỗ...';
     if (!isAuthenticated) return 'Đăng nhập để đặt sân';
-    return checkoutMode === 'saved' ? 'Đặt sân & thanh toán ngay' : 'Đặt sân & thanh toán VNPay';
+    return 'Giữ chỗ & thanh toán';
   })();
 
-  const displayPrice = selectedSlot?.subtotal ?? price;
+  const displayPrice = selectedSlot?.subtotal ?? basePriceVnd;
 
   return (
     <Card className="border-border/70 shadow-sm">
       <CardHeader>
         <CardTitle>Đặt sân</CardTitle>
         <CardDescription>
-          Chọn ngày và khung giờ cho {fieldName}. Sau khi đặt, bạn có 15 phút để thanh toán.
+          Chọn ngày và khung giờ cho {courtName}. Sau khi giữ chỗ, bạn có {holdMinutes} phút để
+          thanh toán.
           {!isAuthenticated && isHydrated
             ? ' Bạn xem lịch tự do — đăng nhập khi sẵn sàng đặt.'
             : null}
@@ -301,8 +204,8 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
                   key={day.value}
                   type="button"
                   onClick={() => {
-                    setDate(day.value);
-                    setSelectedSlot(null);
+                    setDateOverride(day.value);
+                    setSlotOverride(null);
                   }}
                   className={cn(
                     'shrink-0 rounded-lg border px-3 py-2 text-left transition-colors',
@@ -374,60 +277,6 @@ export function BookingPanel({ fieldId, fieldName, price }: BookingPanelProps) {
             </div>
           )}
         </div>
-
-        {isAuthenticated && isHydrated ? (
-          <div className="space-y-3 rounded-lg border bg-muted/40 px-3 py-3">
-            <Label>Thanh toán</Label>
-            {savedMethodsQuery.isLoading ? (
-              <Skeleton className="h-10 w-full" />
-            ) : savedMethods.length > 0 ? (
-              <>
-                <div className="flex flex-col gap-2">
-                  <label className="flex cursor-pointer items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="checkout-mode"
-                      checked={checkoutMode === 'saved'}
-                      onChange={() => setCheckoutMode('saved')}
-                    />
-                    Dùng phương thức đã lưu (demo, không qua VNPay)
-                  </label>
-                  {checkoutMode === 'saved' ? (
-                    <select
-                      value={selectedMethodId}
-                      onChange={(event) => setSelectedMethodId(event.target.value)}
-                      className="h-10 rounded-lg border border-input bg-background px-3 text-sm"
-                    >
-                      {savedMethods.map((method: IUserPaymentMethod) => (
-                        <option key={method.id} value={method.id}>
-                          {formatSavedMethod(method)}
-                          {method.isDefault ? ' (mặc định)' : ''}
-                        </option>
-                      ))}
-                    </select>
-                  ) : null}
-                  <label className="flex cursor-pointer items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="checkout-mode"
-                      checked={checkoutMode === 'vnpay'}
-                      onChange={() => setCheckoutMode('vnpay')}
-                    />
-                    Thanh toán qua VNPay sandbox
-                  </label>
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Chưa có phương thức đã lưu.{' '}
-                <Link href="/account" className="text-primary underline">
-                  Thêm trong Tài khoản
-                </Link>{' '}
-                hoặc dùng VNPay sandbox.
-              </p>
-            )}
-          </div>
-        ) : null}
 
         <div className="space-y-1 rounded-lg border bg-muted/40 px-3 py-2 text-sm">
           <p>

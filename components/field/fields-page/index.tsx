@@ -16,9 +16,10 @@ import {
 } from '@/components/field/map/venue-marker-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getFieldsPage } from '@/lib/api/fields';
+import { getCourtsPage } from '@/lib/api/courts';
+import { hasSport } from '@/lib/api/mappers';
 import { useFavoriteVenueIds } from '@/lib/queries/favorites.query';
-import type { Field, Sport } from '@/lib/api/types';
+import { ICourt } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 const PAGE_SIZE = 12;
@@ -51,32 +52,28 @@ export function FieldsPageContent() {
   const favoriteVenueIds = useFavoriteVenueIds();
 
   const fieldsQuery = useQuery({
-    queryKey: ['fields', 'page', { search, sportId, venueId, minPrice, maxPrice, page }],
+    queryKey: ['courts', 'page', { search, sportId, venueId, minPrice, maxPrice, page }],
     queryFn: () =>
-      getFieldsPage({
-        search: search || undefined,
-        sportId: sportId || undefined,
-        venueId: venueId || undefined,
-        minPrice: minPrice || undefined,
-        maxPrice: maxPrice || undefined,
+      getCourtsPage(
+        {
+          sportId: sportId || undefined,
+          venueId: venueId || undefined,
+          minPrice: minPrice || undefined,
+          maxPrice: maxPrice || undefined,
+        },
+        PAGE_SIZE,
         page,
-        limit: PAGE_SIZE,
-      }),
+      ),
   });
 
   const fields = useMemo(
-    () =>
-      (fieldsQuery.data?.data ?? [])
-        .filter((field: Field) => field.sport)
-        .map((field: Field & { sport: Sport }) => ({ ...field, sport: field.sport })),
+    () => (fieldsQuery.data?.data ?? []).filter(hasSport),
     [fieldsQuery.data?.data],
   );
 
   const displayedFields = useMemo(() => {
     if (!favoritesOnly) return fields;
-    return fields.filter((field: Field & { sport: Sport }) =>
-      favoriteVenueIds.includes(field.venueId),
-    );
+    return fields.filter((court: ICourt) => favoriteVenueIds.includes(court.venueId));
   }, [fields, favoritesOnly, favoriteVenueIds]);
 
   const total = fieldsQuery.data?.total ?? 0;
@@ -134,11 +131,11 @@ export function FieldsPageContent() {
 
           {displayedFields.length > 0 ? (
             <div className="space-y-4">
-              {displayedFields.map((field: Field & { sport: Sport }) => (
+              {displayedFields.map((court: ICourt) => (
                 <FieldCard
-                  key={field.id}
-                  field={field}
-                  isSelected={hoveredFieldId === field.id}
+                  key={court.id}
+                  field={court}
+                  isSelected={hoveredFieldId === court.id}
                   onHover={setHoveredFieldId}
                 />
               ))}
@@ -154,7 +151,12 @@ export function FieldsPageContent() {
         </div>
       </aside>
 
-      <div className={cn('relative min-h-0 flex-1 bg-muted/40', showMapMobile ? 'flex' : 'hidden lg:flex')}>
+      <div
+        className={cn(
+          'relative min-h-0 flex-1 bg-muted/40',
+          showMapMobile ? 'flex' : 'hidden lg:flex',
+        )}
+      >
         <MapView
           fields={displayedFields}
           selectedFieldId={hoveredFieldId}

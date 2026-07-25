@@ -12,8 +12,8 @@ export function buildRegisterUrl(returnPath?: string | null) {
   return `/register?redirect=${encodeURIComponent(redirect)}`;
 }
 
-export function buildFieldBookingReturnPath(
-  fieldId: string,
+export function buildCourtBookingReturnPath(
+  courtId: string,
   draft?: { date?: string; startTime?: string; endTime?: string },
 ) {
   const params = new URLSearchParams();
@@ -21,5 +21,5 @@ export function buildFieldBookingReturnPath(
   if (draft?.startTime) params.set('startTime', draft.startTime);
   if (draft?.endTime) params.set('endTime', draft.endTime);
   const query = params.toString();
-  return query ? `/fields/${fieldId}?${query}` : `/fields/${fieldId}`;
+  return query ? `/courts/${courtId}?${query}` : `/courts/${courtId}`;
 }

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { ChevronDown, Heart, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Sport, Venue } from '@/lib/api/types';
+import type { ISport, IVenue } from '@/lib/api/types';
 import type {
   FieldFilterActions,
   FieldFilterOptions,
@@ -35,11 +35,11 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
   const { updateParams, clearFilters, onSearchSubmit } = actions;
 
   const selectedSport = useMemo(
-    () => sports.find((sport: Sport) => sport.id === sportId),
+    () => sports.find((sport: ISport) => sport.id === sportId),
     [sports, sportId],
   );
   const selectedVenue = useMemo(
-    () => venues.find((venue: Venue) => venue.id === venueId),
+    () => venues.find((venue: IVenue) => venue.id === venueId),
     [venues, venueId],
   );
 
@@ -144,7 +144,7 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
               className={selectClassName}
             >
               <option value="">Tất cả</option>
-              {sports.map((sport: Sport) => (
+              {sports.map((sport: ISport) => (
                 <option key={sport.id} value={sport.id}>
                   {sport.name}
                 </option>
@@ -164,7 +164,7 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
               className={selectClassName}
             >
               <option value="">Tất cả</option>
-              {venues.map((venue: Venue) => (
+              {venues.map((venue: IVenue) => (
                 <option key={venue.id} value={venue.id}>
                   {venue.name}
                 </option>
@@ -181,7 +181,9 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
           >
             <SlidersHorizontal className="size-4" />
             Lọc thêm
-            <ChevronDown className={cn('size-4 transition-transform', showAdvanced && 'rotate-180')} />
+            <ChevronDown
+              className={cn('size-4 transition-transform', showAdvanced && 'rotate-180')}
+            />
           </button>
 
           <button

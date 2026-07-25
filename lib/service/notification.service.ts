@@ -8,7 +8,7 @@ export const notificationService = {
       params,
     }) as Promise<PaginatedResult<INotification> | INotification[]>,
 
-  getUnreadCount: () => apiClient.get('/notifications/unread-count') as Promise<{ count: number }>,
+  getUnreadCount: () => apiClient.get('/notifications/unread-count') as Promise<number>,
 
   markRead: (id: string) => apiClient.patch(`/notifications/${id}/read`) as Promise<INotification>,
 

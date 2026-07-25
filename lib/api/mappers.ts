@@ -1,4 +1,8 @@
-import { IEntityImage, IField, IVenue } from '@/lib/api/types';
+import { IEntityImage, ICourt, ISport, IVenue } from '@/lib/api/types';
+
+export function hasSport(court: ICourt): court is ICourt & { sport: ISport } {
+  return court.sport != null;
+}
 
 export function toImageUrls(images?: IEntityImage[]): string[] {
   if (!images?.length) return [];
@@ -11,17 +15,18 @@ export function toImageUrls(images?: IEntityImage[]): string[] {
 }
 
 export function mapVenue(venue: IVenue): IVenue {
+  const courts = venue.courts?.map(mapCourt);
   return {
     ...venue,
     images: toImageUrls(venue.venueImages),
-    fields: venue.fields?.map(mapField),
+    courts,
   };
 }
 
-export function mapField(field: IField): IField {
+export function mapCourt(court: ICourt): ICourt {
   return {
-    ...field,
-    images: toImageUrls(field.fieldImages),
-    venue: field.venue ? mapVenue({ ...field.venue, fields: undefined }) : field.venue,
+    ...court,
+    images: toImageUrls(court.courtImages),
+    venue: court.venue ? mapVenue({ ...court.venue, courts: undefined }) : court.venue,
   };
 }

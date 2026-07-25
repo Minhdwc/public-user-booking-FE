@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, Menu, User } from 'lucide-react';
+import { Bell, CalendarDays, Heart, Menu, User } from 'lucide-react';
 import { useState } from 'react';
 import logoSquare from '@/assets/logo/logo-9-9.png';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
@@ -16,12 +16,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useNotificationUnreadCount } from '@/lib/queries/notification.query';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/', label: 'Trang chủ' },
-  { href: '/fields', label: 'Sân' },
+  { href: '/courts', label: 'Sân' },
   { href: '/bookings', label: 'Lịch đặt' },
 ];
 
@@ -36,6 +37,8 @@ export function Header() {
   const { user, isAuthenticated, isHydrated, isSessionReady } = useAuthStore();
   const isLoggedIn = isSessionReady && isAuthenticated;
   const { logout, isLoggingOut } = useAuth();
+  const unreadCountQuery = useNotificationUnreadCount();
+  const unreadCount = isLoggedIn ? (unreadCountQuery.data ?? 0) : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-card/90 backdrop-blur-md">
@@ -77,12 +80,31 @@ export function Header() {
           <ThemeToggle />
 
           {isHydrated && isLoggedIn ? (
-            <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
-              <Link href="/bookings">
-                <CalendarDays className="size-4" />
-                Lịch đặt
-              </Link>
-            </Button>
+            <>
+              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
+                <Link href="/favorites">
+                  <Heart className="size-4" />
+                  Yêu thích
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
+                <Link href="/notifications" className="relative">
+                  <Bell className="size-4" />
+                  Thông báo
+                  {unreadCount > 0 ? (
+                    <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  ) : null}
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
+                <Link href="/bookings">
+                  <CalendarDays className="size-4" />
+                  Lịch đặt
+                </Link>
+              </Button>
+            </>
           ) : null}
 
           {isHydrated && isLoggedIn && user ? (
@@ -106,6 +128,12 @@ export function Header() {
               <DropdownMenuContent align="end" className="w-48 rounded-lg">
                 <DropdownMenuItem asChild>
                   <Link href="/account">Tài khoản</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/favorites">Yêu thích</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/notifications">Thông báo</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/bookings">Lịch đặt sân</Link>
@@ -156,14 +184,33 @@ export function Header() {
               );
             })}
             {isHydrated && isLoggedIn ? (
-              <Link
-                href="/bookings"
-                onClick={() => setMobileOpen(false)}
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
-              >
-                <CalendarDays className="size-4" />
-                Lịch đặt sân
-              </Link>
+              <>
+                <Link
+                  href="/favorites"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
+                >
+                  <Heart className="size-4" />
+                  Yêu thích
+                </Link>
+                <Link
+                  href="/notifications"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
+                >
+                  <Bell className="size-4" />
+                  Thông báo
+                  {unreadCount > 0 ? ` (${unreadCount})` : ''}
+                </Link>
+                <Link
+                  href="/bookings"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
+                >
+                  <CalendarDays className="size-4" />
+                  Lịch đặt sân
+                </Link>
+              </>
             ) : null}
           </div>
         </nav>

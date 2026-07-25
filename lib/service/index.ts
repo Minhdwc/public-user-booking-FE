@@ -2,7 +2,7 @@ export { authService, accountService } from './auth.service';
 export { sportService } from './sport.service';
 export { uploadService } from './upload.service';
 export { venueService } from './venue.service';
-export { fieldService } from './field.service';
+export { courtService } from './court.service';
 export { bookingService } from './booking.service';
 export { paymentService } from './payment.service';
 export { paymentMethodService } from './payment-method.service';

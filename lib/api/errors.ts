@@ -14,5 +14,5 @@ export function normalizeApiErrorMessage(message: ApiErrorBody['message']): stri
   if (Array.isArray(message)) {
     return message.join(', ');
   }
-  return message;
+  return message || 'Đã xảy ra lỗi';
 }

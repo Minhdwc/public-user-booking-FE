@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getSports } from '@/lib/api/sports';
 import { getVenues } from '@/lib/api/venues';
-import type { Sport, Venue } from '@/lib/api/types';
+import type { ISport, IVenue } from '@/lib/api/types';
 
 export interface FieldFilterValues {
   search: string;
@@ -17,8 +17,8 @@ export interface FieldFilterValues {
 }
 
 export interface FieldFilterOptions {
-  sports: Sport[];
-  venues: Venue[];
+  sports: ISport[];
+  venues: IVenue[];
   isLoadingSports: boolean;
   isLoadingVenues: boolean;
 }
@@ -77,7 +77,7 @@ export function useFieldFilters() {
     router.push(query ? `${pathname}?${query}` : pathname);
   };
 
-  const clearFilters = () => router.push('/fields');
+  const clearFilters = () => router.push('/courts');
 
   const sportsQuery = useQuery({
     queryKey: ['sports'],

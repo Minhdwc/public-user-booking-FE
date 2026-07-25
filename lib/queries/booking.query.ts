@@ -3,20 +3,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { unwrapList } from '@/lib/api/response';
-import { CreateBookingPayload, ListParams } from '@/lib/api/types';
+import { CreateBookingPayload } from '@/lib/api/types';
 import { bookingService } from '@/lib/service';
-import { fieldKeys } from '@/lib/queries/field.query';
+import { courtKeys } from '@/lib/queries/court.query';
 
 export const bookingKeys = {
   all: ['bookings'] as const,
   lists: () => [...bookingKeys.all, 'list'] as const,
-  list: (params: ListParams = {}) => [...bookingKeys.lists(), params] as const,
+  list: (params: { page?: string; limit?: string } = {}) => [...bookingKeys.lists(), params] as const,
   mine: () => [...bookingKeys.all, 'mine'] as const,
   details: () => [...bookingKeys.all, 'detail'] as const,
   detail: (id: string) => [...bookingKeys.details(), id] as const,
 };
 
-export const useMyBookings = (params?: ListParams) =>
+export const useMyBookings = (params?: { page?: string; limit?: string }) =>
   useQuery({
     queryKey: bookingKeys.mine(),
     queryFn: async () => unwrapList(await bookingService.getBookings({ limit: 100, ...params })),
@@ -37,7 +37,7 @@ export const useCreateBooking = () => {
       queryClient.invalidateQueries({ queryKey: bookingKeys.all });
       for (const item of booking.items ?? []) {
         queryClient.invalidateQueries({
-          queryKey: fieldKeys.detail(item.fieldId),
+          queryKey: courtKeys.detail(item.courtId),
         });
       }
     },

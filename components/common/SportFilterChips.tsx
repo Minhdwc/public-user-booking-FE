@@ -1,11 +1,11 @@
 'use client';
 
 import { Dumbbell, LayoutGrid } from 'lucide-react';
-import type { Sport } from '@/lib/api/types';
+import type { ISport } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 interface SportFilterChipsProps {
-  sports: Sport[];
+  sports: ISport[];
   selectedSportId?: string | null;
   onSelect: (sportId: string | null) => void;
   isLoading?: boolean;
@@ -37,7 +37,11 @@ export function SportFilterChips({
   ];
 
   return (
-    <div className={cn('flex flex-wrap gap-2', className)} role="group" aria-label="Lọc theo môn thể thao">
+    <div
+      className={cn('flex flex-wrap gap-2', className)}
+      role="group"
+      aria-label="Lọc theo môn thể thao"
+    >
       {items.map((item) => {
         const active = selectedSportId === item.id || (item.id === null && !selectedSportId);
         const Icon = item.icon;

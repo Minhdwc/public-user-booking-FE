@@ -6,10 +6,10 @@ import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapControls } from '@/components/field/map/MapControls';
 import type { VenueMapPoint } from '@/components/field/map/venue-marker-dialog';
-import type { Field, Sport } from '@/lib/api/types';
+import type { ICourtWithSport } from '@/lib/api/types';
 
 interface MapViewImplProps {
-  fields: (Field & { sport: Sport })[];
+  fields: ICourtWithSport[];
   selectedFieldId?: string | null;
   favoriteVenueIds?: string[];
   onSelectField?: (fieldId: string) => void;
@@ -24,7 +24,7 @@ function escapeHtml(text: string) {
     .replace(/"/g, '&quot;');
 }
 
-function groupFieldsByVenue(fields: (Field & { sport: Sport })[]): VenueMapPoint[] {
+function groupFieldsByVenue(fields: ICourtWithSport[]): VenueMapPoint[] {
   const venueMap = new Map<string, VenueMapPoint>();
 
   for (const field of fields) {

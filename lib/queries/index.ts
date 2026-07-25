@@ -14,7 +14,7 @@ export {
 
 export { venueKeys, useVenues, useVenuesPage, useVenue } from './venue.query';
 
-export { fieldKeys, useFields, useField, useFieldAvailability } from './field.query';
+export { courtKeys, useCourts, useCourt, useCourtAvailability } from './court.query';
 
 export {
   bookingKeys,

@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { ArrowRight, MapPin, Star } from 'lucide-react';
 import { FavoriteButton } from '@/components/common/FavoriteButton';
-import type { Field, Sport } from '@/lib/api/types';
+import { ICourt } from '@/lib/api/types';
 import { formatPrice } from '@/lib/utils/format';
 import { ImagePlaceholder } from '@/components/common/ImagePlaceholder';
 import { cn } from '@/lib/utils';
 
 interface FieldCardProps {
-  field: Field & { sport: Sport };
+  field: ICourt;
   isSelected?: boolean;
   onHover?: (fieldId: string | null) => void;
 }
@@ -25,7 +25,7 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
 
   return (
     <Link
-      href={`/fields/${field.id}`}
+      href={`/courts/${field.id}`}
       className={cn(
         'group block overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-lg',
         isSelected && 'border-primary/40 ring-2 ring-primary/20 shadow-md',
@@ -48,7 +48,7 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
         <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm backdrop-blur-sm">
-          {field.sport.name}
+          {field.sport?.name}
         </span>
 
         <FavoriteButton
@@ -59,7 +59,7 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
         />
 
         <div className="absolute bottom-3 left-3 rounded-xl bg-white/95 px-3 py-1.5 text-sm font-bold text-primary shadow-sm backdrop-blur-sm">
-          {formatPrice(field.price)}
+          {formatPrice(field.basePriceVnd)}
           <span className="text-xs font-normal text-muted-foreground">/giờ</span>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { VenueGallery } from '@/components/venue/VenueGallery';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getVenueById } from '@/lib/api/venues';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { ICourt } from '@/lib/api/types';
 
 interface VenueDetailContentProps {
   venueId: string;
@@ -49,7 +50,9 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
         <BackLink href="/venues" label="Quay lại danh sách cơ sở" />
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-primary">Cơ sở</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{data.name}</h1>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            {data.name}
+          </h1>
           <p className="mt-3 flex items-start gap-2 text-muted-foreground">
             <MapPin className="mt-0.5 size-4 shrink-0" />
             {data.location}
@@ -73,19 +76,21 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
       <section className="space-y-5">
         <div>
           <h2 className="text-xl font-bold text-foreground">Danh sách sân</h2>
-          <p className="text-sm text-muted-foreground">{data.fields?.length ?? 0} sân đang hoạt động</p>
+          <p className="text-sm text-muted-foreground">
+            {data.courts?.length ?? 0} sân đang hoạt động
+          </p>
         </div>
 
-        {!data.fields?.length ? (
+        {!data.courts?.length ? (
           <div className="surface-muted px-6 py-12 text-center text-muted-foreground">
             Cơ sở này chưa có sân active nào.
           </div>
         ) : (
           <div className="space-y-4">
-            {data.fields
-              .filter((field) => field.sport)
-              .map((field) => (
-                <FieldCard key={field.id} field={{ ...field, sport: field.sport! }} />
+            {data.courts
+              .filter((court: ICourt) => court.sport)
+              .map((court: ICourt) => (
+                <FieldCard key={court.id} field={{ ...court, sport: court.sport! }} />
               ))}
           </div>
         )}

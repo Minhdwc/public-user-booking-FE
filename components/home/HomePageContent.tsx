@@ -3,16 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
-import {
-  ArrowRight,
-  CalendarDays,
-  Clock3,
-  Dumbbell,
-  MapPinned,
-  Navigation,
-  Sparkles,
-  Trophy,
-} from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock3, MapPinned, Navigation, Trophy } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { PageShell } from '@/components/layout/PageShell';
 import { SportFilterChips } from '@/components/common/SportFilterChips';
@@ -24,7 +15,7 @@ import { getRecentlyViewedVenues, getSearchSuggestions } from '@/lib/api/search'
 import { getVenues } from '@/lib/api/venues';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import type { SearchSuggestion } from '@/lib/service/search.service';
-import type { VenueWithFields } from '@/lib/api/types';
+import { ISport, IVenue } from '@/lib/api/types';
 
 const weekdayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
@@ -128,7 +119,7 @@ function HeroSearchBar({ onSearch }: { onSearch: (query: string, date: string) =
 
       {showSuggestions && (suggestionsQuery.data?.length ?? 0) > 0 ? (
         <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-xl border border-border/70 bg-card shadow-lg">
-          {suggestionsQuery.data?.map((suggestion) => (
+          {suggestionsQuery.data?.map((suggestion: SearchSuggestion) => (
             <button
               key={`${suggestion.type}-${suggestion.label}-${suggestion.venueId ?? ''}`}
               type="button"
@@ -262,7 +253,7 @@ export function HomePageContent() {
 
   const handleSearch = (query: string, date: string) => {
     const q = query.trim().toLowerCase();
-    const matchedSport = (sportsQuery.data ?? []).find((sport) => {
+    const matchedSport = (sportsQuery.data || []).find((sport: ISport) => {
       const name = sport.name.trim().toLowerCase();
       return name === q || name.includes(q) || q.includes(name);
     });
@@ -270,7 +261,7 @@ export function HomePageContent() {
     if (matchedSport) {
       const params = new URLSearchParams({ sport: matchedSport.id });
       if (date) params.set('date', date);
-      router.push(`/fields?${params.toString()}`);
+      router.push(`/courts?${params.toString()}`);
       return;
     }
 
@@ -278,11 +269,11 @@ export function HomePageContent() {
     if (query) params.set('search', query);
     if (date) params.set('date', date);
     const qs = params.toString();
-    router.push(query ? `/venues?${qs}` : date ? `/fields?date=${date}` : '/fields');
+    router.push(query ? `/venues?${qs}` : date ? `/courts?date=${date}` : '/courts');
   };
 
   const handleSportSelect = (sportId: string | null) => {
-    router.push(sportId ? `/fields?sport=${sportId}` : '/fields');
+    router.push(sportId ? `/courts?sport=${sportId}` : '/courts');
   };
 
   return (
@@ -313,7 +304,7 @@ export function HomePageContent() {
                   </Link>
                 </Button>
                 <Link
-                  href="/fields"
+                  href="/courts"
                   className="group inline-flex items-center gap-2 font-semibold text-primary hover:underline"
                 >
                   Xem danh sách đầy đủ
@@ -346,7 +337,7 @@ export function HomePageContent() {
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {recentlyViewedQuery.data.map((venue: VenueWithFields) => (
+              {recentlyViewedQuery.data.map((venue: IVenue) => (
                 <VenueCard key={venue.id} venue={venue} />
               ))}
             </div>
@@ -390,7 +381,7 @@ export function HomePageContent() {
 
         {venuesQuery.data && venuesQuery.data.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {venuesQuery.data.map((venue: VenueWithFields) => (
+            {venuesQuery.data.map((venue: IVenue) => (
               <VenueCard key={venue.id} venue={venue} />
             ))}
           </div>

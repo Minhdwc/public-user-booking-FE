@@ -23,7 +23,7 @@ export const useNotifications = (params?: ListParams) =>
 export const useNotificationUnreadCount = () =>
   useQuery({
     queryKey: notificationKeys.unreadCount(),
-    queryFn: async () => (await notificationService.getUnreadCount()).count,
+    queryFn: () => notificationService.getUnreadCount(),
   });
 
 export const useMarkNotificationRead = () => {

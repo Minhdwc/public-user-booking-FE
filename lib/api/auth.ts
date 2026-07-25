@@ -1,4 +1,4 @@
-import type { LoginResponse } from '@/lib/api/types';
+
 import { authService } from '@/lib/service';
 
 export interface LoginPayload {
@@ -14,14 +14,22 @@ export interface RegisterPayload {
   password: string;
 }
 
-export async function login(payload: LoginPayload): Promise<LoginResponse> {
+export const login = (payload: LoginPayload) => {
   return authService.login(payload);
 }
 
-export async function register(payload: RegisterPayload): Promise<LoginResponse> {
+export const register = (payload: RegisterPayload) => {
   return authService.register(payload);
 }
 
-export async function logout(): Promise<{ success: boolean }> {
+export const logout = () => {
   return authService.logout();
+}
+
+export const verifyEmail = (token: string) => {
+  return authService.verifyEmail({ token });
+}
+
+export const resendVerifyEmail = () => {
+  return authService.resendVerifyEmail();
 }

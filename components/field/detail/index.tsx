@@ -8,20 +8,20 @@ import { ReviewList } from '@/components/review/ReviewList';
 import { WriteReviewDialog } from '@/components/review/WriteReviewDialog';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getFieldById } from '@/lib/api/fields';
+import { getCourtById } from '@/lib/api/courts';
 import { getReviewsByVenueId } from '@/lib/api/reviews';
 
 interface FieldDetailContentProps {
-  fieldId: string;
+  courtId: string;
 }
 
-export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
-  const fieldQuery = useQuery({
-    queryKey: ['fields', fieldId],
-    queryFn: () => getFieldById(fieldId),
+export function FieldDetailContent({ courtId }: FieldDetailContentProps) {
+  const courtQuery = useQuery({
+    queryKey: ['courts', courtId],
+    queryFn: () => getCourtById(courtId),
   });
 
-  const venueId = fieldQuery.data?.venueId ?? fieldQuery.data?.venue?.id ?? '';
+  const venueId = courtQuery.data?.venueId || courtQuery.data?.venue?.id || '';
 
   const reviewsQuery = useQuery({
     queryKey: ['reviews', 'venue', venueId],
@@ -29,7 +29,7 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
     enabled: Boolean(venueId),
   });
 
-  if (fieldQuery.isLoading) {
+  if (courtQuery.isLoading) {
     return (
       <div className="space-y-8">
         <Skeleton className="h-5 w-40" />
@@ -44,16 +44,16 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
     );
   }
 
-  if (fieldQuery.isError || !fieldQuery.data) {
+  if (courtQuery.isError || !courtQuery.data) {
     return (
       <ErrorState
         title="Không tìm thấy sân"
         message={
-          fieldQuery.error instanceof Error
-            ? fieldQuery.error.message
+          courtQuery.error instanceof Error
+            ? courtQuery.error.message
             : 'Sân không tồn tại hoặc đã bị ẩn'
         }
-        onRetry={() => fieldQuery.refetch()}
+        onRetry={() => courtQuery.refetch()}
       />
     );
   }
@@ -61,18 +61,18 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
   return (
     <div className="space-y-10 pb-8">
       <BackLink
-        href={fieldQuery.data.venue ? `/venues/${fieldQuery.data.venue.id}` : '/fields'}
-        label={`Quay lại ${fieldQuery.data.venue?.name ?? 'danh sách sân'}`}
+        href={courtQuery.data.venue ? `/venues/${courtQuery.data.venue.id}` : '/courts'}
+        label={`Quay lại ${courtQuery.data.venue?.name}`}
       />
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start xl:gap-10">
-        <FieldInfo field={fieldQuery.data} />
+        <FieldInfo court={courtQuery.data} />
 
         <div className="xl:sticky xl:top-24">
           <BookingPanel
-            fieldId={fieldQuery.data.id}
-            fieldName={fieldQuery.data.name}
-            price={fieldQuery.data.price}
+            courtId={courtQuery.data.id}
+            courtName={courtQuery.data.name}
+            basePriceVnd={courtQuery.data.basePriceVnd}
           />
         </div>
       </div>
@@ -84,7 +84,7 @@ export function FieldDetailContent({ fieldId }: FieldDetailContentProps) {
             <h2 className="text-lg font-bold text-foreground">Đánh giá từ người chơi</h2>
           </div>
           {venueId ? (
-            <WriteReviewDialog venueId={venueId} returnPath={`/fields/${fieldId}`} />
+            <WriteReviewDialog venueId={venueId} returnPath={`/courts/${courtId}`} />
           ) : null}
         </div>
 
