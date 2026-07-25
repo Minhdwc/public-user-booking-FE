@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Be_Vietnam_Pro, JetBrains_Mono } from 'next/font/google';
 import { AuthHydrator } from '@/components/providers/auth-hydrator';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { SocketRealtimeProvider } from '@/components/providers/socket-realtime-provider';
@@ -9,9 +9,10 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import './theme.css';
 
-const fontSans = Inter({
+const fontSans = Be_Vietnam_Pro({
   variable: '--font-geist-sans',
-  subsets: ['latin'],
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const fontMono = JetBrains_Mono({
@@ -35,6 +36,7 @@ export default function RootLayout({
         className={cn(
           fontSans.variable,
           fontMono.variable,
+          fontSans.className,
           'flex min-h-full flex-col bg-background text-foreground antialiased',
         )}
       >

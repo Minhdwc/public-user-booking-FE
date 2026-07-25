@@ -18,3 +18,7 @@ export function formatDate(date: string) {
     year: 'numeric',
   }).format(new Date(date));
 }
+
+export function formatTime(value: string) {
+  return value.slice(0, 5);
+}

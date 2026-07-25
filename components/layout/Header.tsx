@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/', label: 'Trang chủ' },
   { href: '/courts', label: 'Sân' },
+  { href: '/venues', label: 'Cơ sở' },
   { href: '/bookings', label: 'Lịch đặt' },
 ];
 
@@ -51,8 +52,11 @@ export function Header() {
               className="size-9 rounded-xl object-cover shadow-sm"
               priority
             />
-            <span className="text-lg font-bold tracking-tight text-foreground">
+            <span className="hidden text-lg font-bold tracking-tight text-foreground sm:inline">
               Minh Đức Booking Sport
+            </span>
+            <span className="text-base font-bold tracking-tight text-foreground sm:hidden">
+              MĐ Booking
             </span>
           </Link>
 
@@ -96,12 +100,6 @@ export function Header() {
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   ) : null}
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
-                <Link href="/bookings">
-                  <CalendarDays className="size-4" />
-                  Lịch đặt
                 </Link>
               </Button>
             </>

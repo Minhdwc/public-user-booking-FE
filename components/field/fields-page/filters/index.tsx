@@ -10,6 +10,7 @@ import type {
   FieldFilterOptions,
   FieldFilterValues,
 } from '@/components/field/fields-page/useFieldFilters';
+import { FilterSelect } from '@/components/common/FilterSelect';
 import { cn } from '@/lib/utils';
 
 interface FieldFiltersProps {
@@ -25,8 +26,6 @@ interface ActiveFilter {
   onRemove: () => void;
 }
 
-const selectClassName =
-  'h-10 w-full rounded-xl border border-border/60 bg-background px-3 text-sm shadow-sm outline-none transition-colors focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:opacity-60';
 
 export function FieldFilters({ values, options, actions, total }: FieldFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -132,45 +131,35 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
         </form>
 
         <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <label htmlFor="sport-filter" className="text-xs font-medium text-muted-foreground">
-              Môn thể thao
-            </label>
-            <select
-              id="sport-filter"
-              value={sportId ?? ''}
-              onChange={(event) => updateParams({ sport: event.target.value || null, page: null })}
-              disabled={isLoadingSports}
-              className={selectClassName}
-            >
-              <option value="">Tất cả</option>
-              {sports.map((sport: ISport) => (
-                <option key={sport.id} value={sport.id}>
-                  {sport.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FilterSelect
+            id="sport-filter"
+            label="Môn thể thao"
+            value={sportId ?? ''}
+            onChange={(event) => updateParams({ sport: event.target.value || null, page: null })}
+            disabled={isLoadingSports}
+          >
+            <option value="">Tất cả</option>
+            {sports.map((sport: ISport) => (
+              <option key={sport.id} value={sport.id}>
+                {sport.name}
+              </option>
+            ))}
+          </FilterSelect>
 
-          <div className="space-y-1">
-            <label htmlFor="venue-filter" className="text-xs font-medium text-muted-foreground">
-              Cơ sở
-            </label>
-            <select
-              id="venue-filter"
-              value={venueId ?? ''}
-              onChange={(event) => updateParams({ venue: event.target.value || null, page: null })}
-              disabled={isLoadingVenues}
-              className={selectClassName}
-            >
-              <option value="">Tất cả</option>
-              {venues.map((venue: IVenue) => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FilterSelect
+            id="venue-filter"
+            label="Cơ sở"
+            value={venueId ?? ''}
+            onChange={(event) => updateParams({ venue: event.target.value || null, page: null })}
+            disabled={isLoadingVenues}
+          >
+            <option value="">Tất cả</option>
+            {venues.map((venue: IVenue) => (
+              <option key={venue.id} value={venue.id}>
+                {venue.name}
+              </option>
+            ))}
+          </FilterSelect>
         </div>
 
         <div className="flex items-center gap-2">

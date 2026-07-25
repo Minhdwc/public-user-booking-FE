@@ -5,7 +5,7 @@ import logoSquare from '@/assets/logo/logo-9-9.png';
 
 export function Footer() {
   return (
-    <footer className="mt-auto bg-primary text-primary-foreground">
+    <footer className="mt-auto border-t border-border/60 bg-[#0f1a14] text-zinc-100">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 md:grid-cols-12">
         <div className="md:col-span-5">
           <Link href="/" className="flex items-center gap-2.5">
@@ -17,7 +17,7 @@ export function Footer() {
             />
             <span className="text-lg font-bold">Minh Đức Booking Sport</span>
           </Link>
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-400">
             Nền tảng đặt sân thể thao cao cấp — tìm sân, xem lịch trống, giữ chỗ và thanh toán nhanh
             trong vài bước.
           </p>
@@ -26,7 +26,7 @@ export function Footer() {
               <a
                 key={index}
                 href="#"
-                className="inline-flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-primary-foreground/80 transition-colors hover:bg-white/10"
+                className="inline-flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
               >
                 <Icon className="size-4" />
               </a>
@@ -36,7 +36,7 @@ export function Footer() {
 
         <div className="md:col-span-3">
           <p className="text-sm font-semibold uppercase tracking-wide text-white">Khám phá</p>
-          <ul className="mt-5 space-y-3 text-sm text-primary-foreground/70">
+          <ul className="mt-5 space-y-3 text-sm text-zinc-400">
             <li>
               <Link href="/courts" className="inline-flex items-center gap-2 hover:text-white">
                 <LayoutGrid className="size-3.5" />
@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="md:col-span-4">
           <p className="text-sm font-semibold uppercase tracking-wide text-white">Liên hệ</p>
-          <ul className="mt-5 space-y-3 text-sm text-primary-foreground/70">
+          <ul className="mt-5 space-y-3 text-sm text-zinc-400">
             <li className="inline-flex items-center gap-2">
               <Mail className="size-3.5 shrink-0" />
               contact@minhducbooking.vn
@@ -78,13 +78,13 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-5 text-xs text-primary-foreground/60 sm:flex-row sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-5 text-xs text-zinc-500 sm:flex-row sm:px-6">
           <p>© {new Date().getFullYear()} Minh Đức Booking Sport. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-white">
+            <Link href="#" className="hover:text-zinc-300">
               Chính sách bảo mật
             </Link>
-            <Link href="#" className="hover:text-white">
+            <Link href="#" className="hover:text-zinc-300">
               Điều khoản dịch vụ
             </Link>
           </div>

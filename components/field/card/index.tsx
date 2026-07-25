@@ -81,9 +81,9 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
             <span className="text-xs text-muted-foreground">Chưa có đánh giá</span>
           )}
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors group-hover:bg-primary/90">
-            Đặt sân
-            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          <span className="text-xs font-medium text-primary opacity-80 transition-opacity group-hover:opacity-100">
+            Xem chi tiết
+            <ArrowRight className="ml-1 inline size-3.5 transition-transform group-hover:translate-x-0.5" />
           </span>
         </div>
       </div>

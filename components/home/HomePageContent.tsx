@@ -7,6 +7,7 @@ import { ArrowRight, CalendarDays, Clock3, MapPinned, Navigation, Trophy } from 
 import { useQuery } from '@tanstack/react-query';
 import { PageShell } from '@/components/layout/PageShell';
 import { SportFilterChips } from '@/components/common/SportFilterChips';
+import { EmptyState } from '@/components/common/EmptyState';
 import { VenueCard } from '@/components/venue/VenueCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +17,7 @@ import { getVenues } from '@/lib/api/venues';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import type { SearchSuggestion } from '@/lib/service/search.service';
 import { ISport, IVenue } from '@/lib/api/types';
+import { cn } from '@/lib/utils';
 
 const weekdayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
@@ -95,19 +97,29 @@ function HeroSearchBar({ onSearch }: { onSearch: (query: string, date: string) =
             className="w-full bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
           />
         </div>
-        <div className="flex items-center gap-3 px-4 py-3 md:w-64">
-          <CalendarDays className="size-5 shrink-0 text-primary" />
-          <select
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-            className="w-full bg-transparent text-foreground outline-none"
-          >
+        <div className="flex flex-col gap-2 px-4 py-3 md:w-72 md:border-l md:border-border/30">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="size-5 shrink-0 text-primary" />
+            <span className="text-sm font-medium text-foreground">Ngày chơi</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] scrollbar:none [&::-webkit-scrollbar]:hidden">
             {days.map((day) => (
-              <option key={day.value} value={day.value}>
-                {day.label}, {day.dayMonth}
-              </option>
+              <button
+                key={day.value}
+                type="button"
+                onClick={() => setDate(day.value)}
+                className={cn(
+                  'shrink-0 rounded-lg border px-3 py-2 text-left transition-colors',
+                  date === day.value
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border/60 bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground',
+                )}
+              >
+                <span className="block text-xs font-semibold">{day.label}</span>
+                <span className="block text-[11px] tabular-nums">{day.dayMonth}</span>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
         <Button
           type="submit"
@@ -298,9 +310,9 @@ export function HomePageContent() {
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Button asChild className="rounded-lg px-6 py-3">
-                  <Link href="/venues">
+                  <Link href="/courts">
                     <Navigation className="size-4" />
-                    Sân gần tôi
+                    Tìm sân ngay
                   </Link>
                 </Button>
                 <Link
@@ -374,9 +386,12 @@ export function HomePageContent() {
         ) : null}
 
         {!venuesQuery.isLoading && venuesQuery.data?.length === 0 ? (
-          <div className="border border-border/60 bg-muted/50 px-6 py-16 text-center text-muted-foreground">
-            Chưa có cơ sở nào. Hãy thêm dữ liệu từ phía quản trị.
-          </div>
+          <EmptyState
+            title="Chưa có cơ sở nào"
+            description="Hệ thống đang cập nhật danh sách cơ sở thể thao. Quay lại sau nhé."
+            actionLabel="Xem danh sách sân"
+            onAction={() => router.push('/courts')}
+          />
         ) : null}
 
         {venuesQuery.data && venuesQuery.data.length > 0 ? (
