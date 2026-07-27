@@ -3,7 +3,7 @@ import { ApiError, normalizeApiErrorMessage } from '@/lib/api/errors';
 import type { ApiErrorBody, ApiResponse, RefreshResponse } from '@/lib/api/types';
 import { getAuthState, readTokensFromStorage } from '@/lib/stores/auth-store';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+const baseURL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
