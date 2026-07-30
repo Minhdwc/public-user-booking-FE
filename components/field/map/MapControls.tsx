@@ -24,10 +24,7 @@ export function MapControls({ onLocationFound, className }: MapControlsProps) {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const location: [number, number] = [
-          position.coords.latitude,
-          position.coords.longitude,
-        ];
+        const location: [number, number] = [position.coords.latitude, position.coords.longitude];
         map.setView(location, 14);
         onLocationFound(location);
         setLocating(false);

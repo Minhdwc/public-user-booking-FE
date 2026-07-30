@@ -15,7 +15,12 @@ interface FavoriteButtonProps {
   iconClassName?: string;
 }
 
-export function FavoriteButton({ venueId, venueName, className, iconClassName }: FavoriteButtonProps) {
+export function FavoriteButton({
+  venueId,
+  venueName,
+  className,
+  iconClassName,
+}: FavoriteButtonProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isHydrated = useAuthStore((state) => state.isHydrated);
@@ -58,9 +63,7 @@ export function FavoriteButton({ venueId, venueName, className, iconClassName }:
       aria-label={isFavorite ? 'Bỏ lưu' : 'Lưu yêu thích'}
       aria-pressed={isFavorite}
     >
-      <Heart
-        className={cn('size-4', isFavorite && 'fill-primary text-primary', iconClassName)}
-      />
+      <Heart className={cn('size-4', isFavorite && 'fill-primary text-primary', iconClassName)} />
     </button>
   );
 }

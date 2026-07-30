@@ -85,13 +85,23 @@ export function Header() {
 
           {isHydrated && isLoggedIn ? (
             <>
-              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="hidden rounded-lg sm:inline-flex"
+              >
                 <Link href="/favorites">
                   <Heart className="size-4" />
                   Yêu thích
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="sm" className="hidden rounded-lg sm:inline-flex">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="hidden rounded-lg sm:inline-flex"
+              >
                 <Link href="/notifications" className="relative">
                   <Bell className="size-4" />
                   Thông báo

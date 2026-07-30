@@ -43,11 +43,11 @@ function findSportByQuery(query: string, sports: { id: string; name: string }[])
 export function hasActiveFieldFilters(values: FieldFilterValues) {
   return Boolean(
     values.search ||
-      values.sportId ||
-      values.venueId ||
-      values.minPrice ||
-      values.maxPrice ||
-      values.favoritesOnly,
+    values.sportId ||
+    values.venueId ||
+    values.minPrice ||
+    values.maxPrice ||
+    values.favoritesOnly,
   );
 }
 

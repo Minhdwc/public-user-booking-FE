@@ -126,7 +126,9 @@ function MessagePanel({ conversationId }: { conversationId: string }) {
             <div key={message.id} className="rounded-2xl bg-muted/50 px-3 py-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground">{message.sender.name}</span>
-                <span className="text-xs text-muted-foreground">{formatTime(message.createdAt)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {formatTime(message.createdAt)}
+                </span>
               </div>
               <p className="mt-1 text-sm text-foreground">{message.content}</p>
             </div>
@@ -201,7 +203,9 @@ export function ChatPageContent() {
               {activeConversation?.venue ? (
                 <div className="rounded-xl border border-border/70 bg-card px-4 py-3">
                   <p className="font-medium text-foreground">{activeConversation.venue.name}</p>
-                  <p className="text-sm text-muted-foreground">{activeConversation.venue.location}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {activeConversation.venue.location}
+                  </p>
                 </div>
               ) : null}
               <MessagePanel conversationId={activeConversationId} />

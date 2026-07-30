@@ -10,7 +10,8 @@ import { courtKeys } from '@/lib/queries/court.query';
 export const bookingKeys = {
   all: ['bookings'] as const,
   lists: () => [...bookingKeys.all, 'list'] as const,
-  list: (params: { page?: string; limit?: string } = {}) => [...bookingKeys.lists(), params] as const,
+  list: (params: { page?: string; limit?: string } = {}) =>
+    [...bookingKeys.lists(), params] as const,
   mine: () => [...bookingKeys.all, 'mine'] as const,
   details: () => [...bookingKeys.all, 'detail'] as const,
   detail: (id: string) => [...bookingKeys.details(), id] as const,

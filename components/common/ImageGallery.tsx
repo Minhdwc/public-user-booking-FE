@@ -16,7 +16,7 @@ export function ImageGallery({ images, alt, className }: ImageGalleryProps) {
   const hasImages = images.length > 0;
 
   if (!hasImages) {
-      return <ImagePlaceholder className={cn('aspect-video w-full rounded-xl', className)} />;
+    return <ImagePlaceholder className={cn('aspect-video w-full rounded-xl', className)} />;
   }
 
   return (

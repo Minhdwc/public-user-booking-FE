@@ -26,7 +26,6 @@ interface ActiveFilter {
   onRemove: () => void;
 }
 
-
 export function FieldFilters({ values, options, actions, total }: FieldFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { search, sportId, venueId, minPrice, maxPrice, favoritesOnly } = values;

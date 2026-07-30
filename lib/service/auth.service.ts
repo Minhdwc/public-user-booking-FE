@@ -27,8 +27,7 @@ export const authService = {
   verifyEmail: (body: { token: string }) =>
     apiClient.post('/auth/verify-email', body) as Promise<{ success: boolean }>,
 
-  resendVerifyEmail: () =>
-    apiClient.post('/auth/resend-verify') as Promise<{ success: boolean }>,
+  resendVerifyEmail: () => apiClient.post('/auth/resend-verify') as Promise<{ success: boolean }>,
 };
 
 export const accountService = {

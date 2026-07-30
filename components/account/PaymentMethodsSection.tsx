@@ -113,7 +113,9 @@ function AddPaymentMethodDialog() {
             <Input
               id="payment-provider"
               value={form.provider}
-              onChange={(event) => setForm((current) => ({ ...current, provider: event.target.value }))}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, provider: event.target.value }))
+              }
               placeholder="VD: Vietcombank, MoMo cá nhân"
             />
           </div>

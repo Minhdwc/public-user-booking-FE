@@ -137,7 +137,12 @@ export function WriteReviewDialog({ venueId, returnPath }: WriteReviewDialogProp
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-lg"
+              onClick={() => handleOpen(false)}
+            >
               Huỷ
             </Button>
             <Button
