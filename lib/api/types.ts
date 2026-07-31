@@ -103,7 +103,7 @@ export interface IAvailabilitySlot {
   endTime: string;
   durationMinutes: number;
   subtotal: number;
-  status: 'available' | 'booked';
+  status: 'available' | 'booked' | 'past';
 }
 
 export interface ICourtAvailability {

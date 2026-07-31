@@ -14,6 +14,7 @@ import { ApiError } from '@/lib/api/errors';
 import { IAvailabilitySlot } from '@/lib/api/types';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { buildCourtBookingReturnPath, buildLoginUrl } from '@/lib/utils/auth-action';
+import { isSlotSelectable, next7DaysVn, todayIsoDateVn } from '@/lib/utils/booking-time';
 import { cn } from '@/lib/utils';
 
 interface BookingPanelProps {
@@ -29,33 +30,11 @@ type SelectedSlot = {
 };
 
 function todayLocalIsoDate() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return todayIsoDateVn();
 }
 
-const weekdayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-
 function next7Days() {
-  const now = new Date();
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(now);
-    date.setDate(now.getDate() + i);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const value = `${year}-${month}-${day}`;
-    days.push({
-      value,
-      weekday: weekdayLabels[date.getDay()],
-      dayMonth: `${date.getDate()}/${date.getMonth() + 1}`,
-      isToday: i === 0,
-    });
-  }
-  return days;
+  return next7DaysVn();
 }
 
 function formatSlotTime(value: string) {
@@ -132,6 +111,8 @@ export function BookingPanel({ courtId, courtName, basePriceVnd }: BookingPanelP
   const slots = useMemo(() => availabilityQuery.data?.slots ?? [], [availabilityQuery.data?.slots]);
 
   const handleSelectSlot = (slot: IAvailabilitySlot) => {
+    if (!isSlotSelectable(date, slot)) return;
+
     setSlotOverride({
       startTime: slot.startTime,
       endTime: slot.endTime,
@@ -153,6 +134,11 @@ export function BookingPanel({ courtId, courtName, basePriceVnd }: BookingPanelP
 
     if (!selectedSlot) {
       toast.error('Vui lòng chọn khung giờ');
+      return;
+    }
+
+    if (!isSlotSelectable(date, { ...selectedSlot, status: 'available' })) {
+      toast.error('Khung giờ đã qua, vui lòng chọn khung giờ khác');
       return;
     }
 
@@ -257,6 +243,8 @@ export function BookingPanel({ courtId, courtName, basePriceVnd }: BookingPanelP
               {slots.map((slot: IAvailabilitySlot) => {
                 const label = `${formatSlotTime(slot.startTime)}–${formatSlotTime(slot.endTime)}`;
                 const isBooked = slot.status === 'booked';
+                const isPast = slot.status === 'past' || !isSlotSelectable(date, slot);
+                const isUnavailable = isBooked || isPast;
                 const isSelected =
                   selectedSlot &&
                   slotKey(selectedSlot) === slotKey({ ...slot, subtotal: slot.subtotal });
@@ -266,11 +254,11 @@ export function BookingPanel({ courtId, courtName, basePriceVnd }: BookingPanelP
                     key={slotKey({ ...slot, subtotal: slot.subtotal })}
                     type="button"
                     variant={isSelected ? 'default' : 'outline'}
-                    disabled={isBooked}
-                    className={cn('w-full px-2 text-xs', isBooked && 'opacity-50')}
+                    disabled={isUnavailable}
+                    className={cn('w-full px-2 text-xs', isUnavailable && 'opacity-50')}
                     onClick={() => handleSelectSlot(slot)}
                   >
-                    {isBooked ? `${label} (hết)` : label}
+                    {isBooked ? `${label} (hết)` : isPast ? `${label} (đã qua)` : label}
                   </Button>
                 );
               })}
