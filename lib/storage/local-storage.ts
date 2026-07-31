@@ -72,6 +72,11 @@ export function persistTokens(accessToken: string, refreshToken: string) {
 
   window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+
+  for (const key of LEGACY_STORAGE_KEYS) {
+    window.localStorage.removeItem(key);
+  }
+
   pruneLocalStorage();
 }
 
@@ -80,5 +85,10 @@ export function clearPersistedTokens() {
 
   window.localStorage.removeItem(ACCESS_TOKEN_KEY);
   window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+
+  for (const key of LEGACY_STORAGE_KEYS) {
+    window.localStorage.removeItem(key);
+  }
+
   pruneLocalStorage();
 }
