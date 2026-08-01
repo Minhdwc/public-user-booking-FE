@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { List, Map as MapIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Pagination } from '@/components/common/Pagination';
@@ -18,11 +19,14 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCourtsPage } from '@/lib/api/courts';
 import { hasSport } from '@/lib/api/mappers';
+import { useUserLocation } from '@/lib/hooks/use-user-location';
 import { useFavoriteVenueIds } from '@/lib/queries/favorites.query';
 import { ICourt } from '@/lib/api/types';
+import { formatDistanceKm, getCourtDistanceKm } from '@/lib/utils/geo';
 import { cn } from '@/lib/utils';
 
 const PAGE_SIZE = 12;
+const NEAR_ME_FETCH_LIMIT = 100;
 
 function FieldCardSkeleton() {
   return (
@@ -40,10 +44,20 @@ function FieldCardSkeleton() {
   );
 }
 
+function sortCourtsByDistance(courts: ICourt[], userLocation: { latitude: number; longitude: number }) {
+  return [...courts].sort((a, b) => {
+    const distanceA = getCourtDistanceKm(a, userLocation) ?? Number.POSITIVE_INFINITY;
+    const distanceB = getCourtDistanceKm(b, userLocation) ?? Number.POSITIVE_INFINITY;
+    return distanceA - distanceB;
+  });
+}
+
 export function FieldsPageContent() {
   const { values, options, actions, page, hasActiveFilters } = useFieldFilters();
-  const { search, sportId, venueId, minPrice, maxPrice, favoritesOnly } = values;
+  const { search, sportId, venueId, minPrice, maxPrice, favoritesOnly, nearMe } = values;
   const { clearFilters, updateParams } = actions;
+  const { location, status: locationStatus, error: locationError, requestLocation, applyLocation } =
+    useUserLocation();
 
   const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null);
   const [showMapMobile, setShowMapMobile] = useState(false);
@@ -51,19 +65,46 @@ export function FieldsPageContent() {
   const [mapVenueDialogOpen, setMapVenueDialogOpen] = useState(false);
   const favoriteVenueIds = useFavoriteVenueIds();
 
+  useEffect(() => {
+    if (nearMe && locationStatus === 'idle') {
+      requestLocation();
+    }
+  }, [nearMe, locationStatus, requestLocation]);
+
+  useEffect(() => {
+    if (locationStatus === 'error' && nearMe) {
+      toast.error(locationError ?? 'Không thể lấy vị trí của bạn');
+      updateParams({ near: null, page: null });
+    }
+  }, [locationError, locationStatus, nearMe, updateParams]);
+
   const fieldsQuery = useQuery({
-    queryKey: ['courts', 'page', { search, sportId, venueId, minPrice, maxPrice, page }],
+    queryKey: [
+      'courts',
+      'page',
+      {
+        search,
+        sportId,
+        venueId,
+        minPrice,
+        maxPrice,
+        mode: nearMe ? 'near' : 'paged',
+        page: nearMe ? 1 : page,
+      },
+    ],
     queryFn: () =>
       getCourtsPage(
         {
+          search: search || undefined,
           sportId: sportId || undefined,
           venueId: venueId || undefined,
           minPrice: minPrice || undefined,
           maxPrice: maxPrice || undefined,
         },
-        PAGE_SIZE,
-        page,
+        nearMe ? NEAR_ME_FETCH_LIMIT : PAGE_SIZE,
+        nearMe ? 1 : page,
       ),
+    enabled: !nearMe || locationStatus === 'success',
   });
 
   const fields = useMemo(
@@ -71,13 +112,63 @@ export function FieldsPageContent() {
     [fieldsQuery.data?.data],
   );
 
-  const displayedFields = useMemo(() => {
+  const filteredFields = useMemo(() => {
     if (!favoritesOnly) return fields;
     return fields.filter((court: ICourt) => favoriteVenueIds.includes(court.venueId));
   }, [fields, favoritesOnly, favoriteVenueIds]);
 
-  const total = fieldsQuery.data?.total ?? 0;
-  const hasNext = page * PAGE_SIZE < total;
+  const sortedFields = useMemo(() => {
+    if (!nearMe || !location) return filteredFields;
+    return sortCourtsByDistance(filteredFields, location);
+  }, [filteredFields, location, nearMe]);
+
+  const displayedFields = useMemo(() => {
+    if (!nearMe) return sortedFields;
+    const start = (page - 1) * PAGE_SIZE;
+    return sortedFields.slice(start, start + PAGE_SIZE);
+  }, [nearMe, page, sortedFields]);
+
+  const distanceByCourtId = useMemo(() => {
+    if (!nearMe || !location) return new Map<string, string>();
+    return new Map<string, string>(
+      sortedFields
+        .map((court: ICourt) => {
+          const distanceKm = getCourtDistanceKm(court, location);
+          return distanceKm == null
+            ? null
+            : ([court.id, formatDistanceKm(distanceKm)] as const);
+        })
+        .filter(
+          (entry: readonly [string, string] | null): entry is readonly [string, string] =>
+            entry != null,
+        ),
+    );
+  }, [location, nearMe, sortedFields]);
+
+  const total = nearMe ? sortedFields.length : (fieldsQuery.data?.total ?? 0);
+  const hasNext = nearMe ? page * PAGE_SIZE < sortedFields.length : page * PAGE_SIZE < total;
+  const isLocating = nearMe && locationStatus === 'locating';
+  const userMapLocation = location
+    ? ([location.latitude, location.longitude] as [number, number])
+    : null;
+
+  const handleNearMeToggle = () => {
+    if (nearMe) {
+      updateParams({ near: null, page: null });
+      return;
+    }
+    updateParams({ near: '1', page: null });
+    requestLocation();
+  };
+
+  const handleUserLocationChange = (coords: [number, number]) => {
+    applyLocation({ latitude: coords[0], longitude: coords[1] });
+    if (!nearMe) {
+      updateParams({ near: '1', page: null });
+    }
+  };
+
+  const isLoadingList = isLocating || fieldsQuery.isLoading;
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col lg:flex-row">
@@ -91,11 +182,13 @@ export function FieldsPageContent() {
           values={values}
           options={options}
           actions={actions}
-          total={favoritesOnly ? displayedFields.length : total}
+          total={total}
+          locating={isLocating}
+          onNearMeToggle={handleNearMeToggle}
         />
 
         <div className="flex-1 overflow-y-auto bg-muted/20 px-3 py-4 sm:px-4">
-          {fieldsQuery.isLoading ? (
+          {isLoadingList ? (
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, index) => (
                 <FieldCardSkeleton key={index} />
@@ -114,14 +207,18 @@ export function FieldsPageContent() {
             />
           ) : null}
 
-          {!fieldsQuery.isLoading && !fieldsQuery.isError && displayedFields.length === 0 ? (
+          {!isLoadingList &&
+          !fieldsQuery.isError &&
+          displayedFields.length === 0 ? (
             <div className="flex min-h-64 items-center justify-center">
               <EmptyState
                 title={favoritesOnly ? 'Chưa có sân yêu thích' : 'Không tìm thấy sân'}
                 description={
                   favoritesOnly
                     ? 'Nhấn biểu tượng trái tim trên sân bạn thích để lưu lại.'
-                    : 'Thử đổi từ khóa hoặc bộ lọc khác.'
+                    : nearMe
+                      ? 'Không có sân nào gần vị trí hiện tại. Thử tắt "Gần tôi" hoặc đổi bộ lọc.'
+                      : 'Thử đổi từ khóa hoặc bộ lọc khác.'
                 }
                 actionLabel={hasActiveFilters ? 'Xóa bộ lọc' : undefined}
                 onAction={hasActiveFilters ? clearFilters : undefined}
@@ -137,6 +234,7 @@ export function FieldsPageContent() {
                   field={court}
                   isSelected={hoveredFieldId === court.id}
                   onHover={setHoveredFieldId}
+                  distanceLabel={distanceByCourtId.get(court.id)}
                 />
               ))}
               <Pagination
@@ -158,9 +256,11 @@ export function FieldsPageContent() {
         )}
       >
         <MapView
-          fields={displayedFields}
+          fields={nearMe ? sortedFields : filteredFields}
           selectedFieldId={hoveredFieldId}
           favoriteVenueIds={favoriteVenueIds}
+          userLocation={userMapLocation}
+          onUserLocationChange={handleUserLocationChange}
           onSelectField={setHoveredFieldId}
           onVenueClick={(venue) => {
             setSelectedMapVenue(venue);

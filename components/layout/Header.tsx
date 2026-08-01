@@ -3,10 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, CalendarDays, Heart, Menu, User } from 'lucide-react';
+import { Bell, CalendarDays, Heart, Menu, MessageSquare, User } from 'lucide-react';
 import { useState } from 'react';
 import logoSquare from '@/assets/logo/logo-9-9.png';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
+import {
+  HeaderQuickSheets,
+  type HeaderQuickSheet,
+} from '@/components/layout/HeaderQuickSheets';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -35,14 +39,20 @@ function isNavActive(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSheet, setActiveSheet] = useState<HeaderQuickSheet>(null);
   const { user, isAuthenticated, isHydrated, isSessionReady } = useAuthStore();
   const isLoggedIn = isSessionReady && isAuthenticated;
   const { logout, isLoggingOut } = useAuth();
   const unreadCountQuery = useNotificationUnreadCount();
   const unreadCount = isLoggedIn ? (unreadCountQuery.data ?? 0) : 0;
 
+  const openSheet = (sheet: Exclude<HeaderQuickSheet, null>) => {
+    setMobileOpen(false);
+    setActiveSheet(sheet);
+  };
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-card/90 backdrop-blur-md">
+    <header className="sticky top-0 z-[1100] border-b border-border/70 bg-card/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2.5">
@@ -86,31 +96,29 @@ export function Header() {
           {isHydrated && isLoggedIn ? (
             <>
               <Button
-                asChild
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="hidden rounded-lg sm:inline-flex"
+                onClick={() => openSheet('favorites')}
               >
-                <Link href="/favorites">
-                  <Heart className="size-4" />
-                  Yêu thích
-                </Link>
+                <Heart className="size-4" />
+                Yêu thích
               </Button>
               <Button
-                asChild
+                type="button"
                 variant="ghost"
                 size="sm"
-                className="hidden rounded-lg sm:inline-flex"
+                className="relative hidden rounded-lg sm:inline-flex"
+                onClick={() => openSheet('notifications')}
               >
-                <Link href="/notifications" className="relative">
-                  <Bell className="size-4" />
-                  Thông báo
-                  {unreadCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  ) : null}
-                </Link>
+                <Bell className="size-4" />
+                Thông báo
+                {unreadCount > 0 ? (
+                  <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                ) : null}
               </Button>
             </>
           ) : null}
@@ -135,13 +143,32 @@ export function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-lg">
                 <DropdownMenuItem asChild>
+                  <Link href="/account/profile">Hồ sơ cá nhân</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/account/change-password">Đổi mật khẩu</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/account">Tài khoản</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/favorites">Yêu thích</Link>
+                  <Link href="/messages">Tin nhắn</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/notifications">Thông báo</Link>
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    openSheet('favorites');
+                  }}
+                >
+                  Yêu thích
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    openSheet('notifications');
+                  }}
+                >
+                  Thông báo
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/bookings">Lịch đặt sân</Link>
@@ -193,22 +220,30 @@ export function Header() {
             })}
             {isHydrated && isLoggedIn ? (
               <>
-                <Link
-                  href="/favorites"
-                  onClick={() => setMobileOpen(false)}
+                <button
+                  type="button"
+                  onClick={() => openSheet('favorites')}
                   className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
                 >
                   <Heart className="size-4" />
                   Yêu thích
-                </Link>
-                <Link
-                  href="/notifications"
-                  onClick={() => setMobileOpen(false)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openSheet('notifications')}
                   className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
                 >
                   <Bell className="size-4" />
                   Thông báo
                   {unreadCount > 0 ? ` (${unreadCount})` : ''}
+                </button>
+                <Link
+                  href="/messages"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent"
+                >
+                  <MessageSquare className="size-4" />
+                  Tin nhắn
                 </Link>
                 <Link
                   href="/bookings"
@@ -222,6 +257,10 @@ export function Header() {
             ) : null}
           </div>
         </nav>
+      ) : null}
+
+      {isLoggedIn ? (
+        <HeaderQuickSheets activeSheet={activeSheet} onActiveSheetChange={setActiveSheet} />
       ) : null}
     </header>
   );

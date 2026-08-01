@@ -9,6 +9,14 @@ export const chatKeys = {
   messages: (conversationId: string) => [...chatKeys.all, 'messages', conversationId] as const,
 };
 
+export function appendChatMessage(
+  current: ChatMessage[] | undefined,
+  message: ChatMessage,
+): ChatMessage[] {
+  if (current?.some((row) => row.id === message.id)) return current;
+  return [...(current ?? []), message];
+}
+
 export function useChatConversations(enabled = true) {
   return useQuery({
     queryKey: chatKeys.conversations(),
@@ -43,10 +51,9 @@ export function useSendChatMessage(conversationId: string) {
   return useMutation({
     mutationFn: (content: string) => chatService.sendMessage(conversationId, content),
     onSuccess: (message: ChatMessage) => {
-      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(conversationId), (current) => [
-        ...(current ?? []),
-        message,
-      ]);
+      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(conversationId), (current: ChatMessage[] | undefined) =>
+        appendChatMessage(current, message),
+      );
       void queryClient.invalidateQueries({ queryKey: chatKeys.conversations() });
     },
   });

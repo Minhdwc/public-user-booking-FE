@@ -13,11 +13,12 @@ export const notificationKeys = {
   unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
 };
 
-export const useNotifications = (params?: ListParams) =>
+export const useNotifications = (params?: ListParams, options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: notificationKeys.list(params ?? {}),
     queryFn: async () =>
       unwrapList(await notificationService.getNotifications({ limit: 50, ...params })),
+    enabled: options?.enabled ?? true,
   });
 
 export const useNotificationUnreadCount = () =>

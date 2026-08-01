@@ -63,8 +63,17 @@ function NotificationItem({
   );
 }
 
-export function NotificationsPageContent() {
-  const notificationsQuery = useNotifications();
+interface NotificationsPageContentProps {
+  variant?: 'page' | 'sheet';
+  active?: boolean;
+}
+
+export function NotificationsPageContent({
+  variant = 'page',
+  active = true,
+}: NotificationsPageContentProps) {
+  const isSheet = variant === 'sheet';
+  const notificationsQuery = useNotifications(undefined, { enabled: active });
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
 
@@ -96,21 +105,26 @@ export function NotificationsPageContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <PageHeader
-          eyebrow="Hộp thư"
-          title="Thông báo"
-          description={
-            unreadCount > 0
-              ? `${unreadCount} thông báo chưa đọc`
-              : 'Theo dõi cập nhật đặt sân và tài khoản'
-          }
-        />
+    <div className={isSheet ? 'space-y-4' : 'space-y-6'}>
+      <div className={cn('flex flex-col gap-4', !isSheet && 'sm:flex-row sm:items-end sm:justify-between')}>
+        {!isSheet ? (
+          <PageHeader
+            eyebrow="Hộp thư"
+            title="Thông báo"
+            description={
+              unreadCount > 0
+                ? `${unreadCount} thông báo chưa đọc`
+                : 'Theo dõi cập nhật đặt sân và tài khoản'
+            }
+          />
+        ) : unreadCount > 0 ? (
+          <p className="text-sm text-muted-foreground">{unreadCount} thông báo chưa đọc</p>
+        ) : null}
         {unreadCount > 0 ? (
           <Button
             variant="outline"
-            className="rounded-lg"
+            size="sm"
+            className="shrink-0 rounded-lg self-start"
             disabled={markAllReadMutation.isPending}
             onClick={() => markAllReadMutation.mutate()}
           >

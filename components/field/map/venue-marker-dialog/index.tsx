@@ -9,6 +9,7 @@ import { ImagePlaceholder } from '@/components/common/ImagePlaceholder';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ICourt } from '@/lib/api/types';
 import { getVenueById } from '@/lib/api/venues';
+import { formatTime } from '@/lib/utils/format';
 
 export interface VenueMapPoint {
   venueId: string;
@@ -23,10 +24,6 @@ interface VenueMapMarkerDialogProps {
   venue: VenueMapPoint | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-function formatTime(value: string) {
-  return value.slice(0, 5);
 }
 
 export function VenueMapMarkerDialog({ venue, open, onOpenChange }: VenueMapMarkerDialogProps) {

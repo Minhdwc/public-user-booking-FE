@@ -93,14 +93,20 @@ export function VenueDetailContent({ venueId }: VenueDetailContentProps) {
               <Clock3 className="size-4 text-primary" />
               Giờ hoạt động
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {formatTime(data.openTime)} – {formatTime(data.closeTime)}
-            </p>
-            {data.restStartTime && data.restEndTime ? (
-              <p className="mt-1 text-xs text-muted-foreground">
-                Nghỉ trưa: {formatTime(data.restStartTime)} – {formatTime(data.restEndTime)}
-              </p>
-            ) : null}
+            {data.openTime && data.closeTime ? (
+              <>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {formatTime(data.openTime)} – {formatTime(data.closeTime)}
+                </p>
+                {data.restStartTime && data.restEndTime ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Nghỉ trưa: {formatTime(data.restStartTime)} – {formatTime(data.restEndTime)}
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">Chưa cập nhật giờ hoạt động</p>
+            )}
           </div>
 
           <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm sm:col-span-2">

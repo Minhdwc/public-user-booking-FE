@@ -10,9 +10,10 @@ interface FieldCardProps {
   field: ICourt;
   isSelected?: boolean;
   onHover?: (fieldId: string | null) => void;
+  distanceLabel?: string;
 }
 
-export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
+export function FieldCard({ field, isSelected, onHover, distanceLabel }: FieldCardProps) {
   const coverImage = field.images?.[0];
   const ratingAverage = field.venue?.ratingAverage;
   const ratingCount = field.venue?.ratingCount ?? 0;
@@ -67,6 +68,11 @@ export function FieldCard({ field, isSelected, onHover }: FieldCardProps) {
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin className="size-3.5 shrink-0" />
             <span className="line-clamp-1">{field.venue?.name ?? 'Chưa có cơ sở'}</span>
+            {distanceLabel ? (
+              <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                {distanceLabel}
+              </span>
+            ) : null}
           </p>
         </div>
 

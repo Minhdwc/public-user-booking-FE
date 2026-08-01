@@ -1,5 +1,16 @@
 import { IEntityImage, ICourt, ISport, IVenue } from '@/lib/api/types';
 
+type VenueApiPayload = IVenue & {
+  address?: string;
+  district?: string;
+  city?: string;
+};
+
+function buildVenueLocation(venue: VenueApiPayload) {
+  if (venue.location?.trim()) return venue.location;
+  return [venue.address, venue.district, venue.city].filter(Boolean).join(', ');
+}
+
 export function hasSport(court: ICourt): court is ICourt & { sport: ISport } {
   return court.sport != null;
 }
@@ -14,10 +25,15 @@ export function toImageUrls(images?: IEntityImage[]): string[] {
     .map((image) => image.url);
 }
 
-export function mapVenue(venue: IVenue): IVenue {
+export function mapVenue(venue: VenueApiPayload): IVenue {
   const courts = venue.courts?.map(mapCourt);
+  const operatingHour = venue.operatingHours?.[0];
+
   return {
     ...venue,
+    location: buildVenueLocation(venue),
+    openTime: venue.openTime ?? operatingHour?.openTime,
+    closeTime: venue.closeTime ?? operatingHour?.closeTime,
     images: toImageUrls(venue.venueImages),
     courts,
   };

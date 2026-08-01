@@ -8,6 +8,8 @@ interface MapViewProps {
   fields: ICourtWithSport[];
   selectedFieldId?: string | null;
   favoriteVenueIds?: string[];
+  userLocation?: [number, number] | null;
+  onUserLocationChange?: (location: [number, number]) => void;
   onSelectField?: (fieldId: string) => void;
   onVenueClick?: (venue: VenueMapPoint) => void;
 }

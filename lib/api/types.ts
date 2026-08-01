@@ -53,14 +53,26 @@ export interface IPaymentMethod {
   updatedAt: string;
 }
 
+export interface IOperatingHour {
+  id?: string;
+  venueId?: string;
+  dayOfWeek: number;
+  openTime: string;
+  closeTime: string;
+}
+
 export interface IVenue {
   id: string;
   name: string;
   location: string;
+  address?: string;
+  district?: string;
+  city?: string;
   longitude: number;
   latitude: number;
-  openTime: string;
-  closeTime: string;
+  openTime?: string;
+  closeTime?: string;
+  operatingHours?: IOperatingHour[];
   restStartTime?: string;
   restEndTime?: string;
   description?: string;
@@ -254,6 +266,7 @@ export interface CourtListParams {
   status?: 'active' | 'inactive';
   minPrice?: number | string;
   maxPrice?: number | string;
+  search?: string;
 }
 
 export interface ListParams {

@@ -19,6 +19,7 @@ export function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-export function formatTime(value: string) {
+export function formatTime(value?: string | null) {
+  if (!value) return '—';
   return value.slice(0, 5);
 }

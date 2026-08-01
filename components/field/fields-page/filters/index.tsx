@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ChevronDown, Heart, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Heart, LocateFixed, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { ISport, IVenue } from '@/lib/api/types';
@@ -18,6 +18,8 @@ interface FieldFiltersProps {
   options: FieldFilterOptions;
   actions: FieldFilterActions;
   total: number;
+  locating?: boolean;
+  onNearMeToggle: () => void;
 }
 
 interface ActiveFilter {
@@ -26,9 +28,16 @@ interface ActiveFilter {
   onRemove: () => void;
 }
 
-export function FieldFilters({ values, options, actions, total }: FieldFiltersProps) {
+export function FieldFilters({
+  values,
+  options,
+  actions,
+  total,
+  locating = false,
+  onNearMeToggle,
+}: FieldFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const { search, sportId, venueId, minPrice, maxPrice, favoritesOnly } = values;
+  const { search, sportId, venueId, minPrice, maxPrice, favoritesOnly, nearMe } = values;
   const { sports, venues, isLoadingSports, isLoadingVenues } = options;
   const { updateParams, clearFilters, onSearchSubmit } = actions;
 
@@ -84,8 +93,15 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
         onRemove: () => updateParams({ favorites: null, page: null }),
       });
     }
+    if (nearMe) {
+      filters.push({
+        key: 'near',
+        label: 'Gần tôi',
+        onRemove: () => updateParams({ near: null, page: null }),
+      });
+    }
     return filters;
-  }, [search, selectedSport, selectedVenue, minPrice, maxPrice, favoritesOnly, updateParams]);
+  }, [search, selectedSport, selectedVenue, minPrice, maxPrice, favoritesOnly, nearMe, updateParams]);
 
   const hasFilters = activeFilters.length > 0;
 
@@ -162,6 +178,22 @@ export function FieldFilters({ values, options, actions, total }: FieldFiltersPr
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onNearMeToggle}
+            disabled={locating}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors',
+              nearMe
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border/60 bg-background text-muted-foreground hover:bg-accent hover:text-foreground',
+              locating && 'opacity-70',
+            )}
+          >
+            <LocateFixed className={cn('size-4', locating && 'animate-pulse')} />
+            {locating ? 'Đang định vị...' : 'Gần tôi'}
+          </button>
+
           <button
             type="button"
             onClick={() => setShowAdvanced((prev) => !prev)}

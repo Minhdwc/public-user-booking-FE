@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import L from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12,6 +12,8 @@ interface MapViewImplProps {
   fields: ICourtWithSport[];
   selectedFieldId?: string | null;
   favoriteVenueIds?: string[];
+  userLocation?: [number, number] | null;
+  onUserLocationChange?: (location: [number, number]) => void;
   onSelectField?: (fieldId: string) => void;
   onVenueClick?: (venue: VenueMapPoint) => void;
 }
@@ -110,14 +112,37 @@ const userLocationIcon = L.divIcon({
   iconAnchor: [12, 12],
 });
 
+function FitUserAndVenuesBounds({
+  userLocation,
+  venues,
+}: {
+  userLocation: [number, number];
+  venues: VenueMapPoint[];
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    const points: [number, number][] = [userLocation];
+    venues.forEach((venue) => points.push([venue.latitude, venue.longitude]));
+    if (points.length === 1) {
+      map.setView(userLocation, 14);
+      return;
+    }
+    map.fitBounds(L.latLngBounds(points), { padding: [60, 60], maxZoom: 14 });
+  }, [map, userLocation, venues]);
+
+  return null;
+}
+
 export function MapViewImpl({
   fields,
   selectedFieldId,
   favoriteVenueIds = [],
+  userLocation = null,
+  onUserLocationChange,
   onSelectField,
   onVenueClick,
 }: MapViewImplProps) {
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   const venuePoints = useMemo(() => groupFieldsByVenue(fields), [fields]);
   const favoriteSet = useMemo(() => new Set(favoriteVenueIds), [favoriteVenueIds]);
@@ -148,15 +173,20 @@ export function MapViewImpl({
 
   return (
     <MapContainer center={defaultCenter} zoom={13} className="h-full w-full" scrollWheelZoom>
-      {!selectedCenter ? <FitVenueBounds venues={venuePoints} /> : null}
+      {!selectedCenter && !userLocation ? <FitVenueBounds venues={venuePoints} /> : null}
       {selectedCenter ? <ChangeView target={selectedCenter} zoom={15} /> : null}
+      {userLocation ? <FitUserAndVenuesBounds userLocation={userLocation} venues={venuePoints} /> : null}
 
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <MapControls onLocationFound={setUserLocation} />
+      <MapControls
+        onLocationFound={(coords) => {
+          onUserLocationChange?.(coords);
+        }}
+      />
 
       {userLocation ? <Marker position={userLocation} icon={userLocationIcon} /> : null}
 

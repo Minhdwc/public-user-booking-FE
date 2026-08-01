@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -131,11 +132,64 @@ html.dark {
   .user-location-marker-dot {
     @apply size-3 rounded-full bg-sky-500 ring-4 ring-sky-500/25;
   }
+
+  .sheet-overlay[data-state='open'] {
+    animation: sheet-overlay-in 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .sheet-overlay[data-state='closed'] {
+    animation: sheet-overlay-out 0.24s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .sheet-panel-right[data-state='open'] {
+    animation: sheet-panel-in-right 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .sheet-panel-right[data-state='closed'] {
+    animation: sheet-panel-out-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+}
+
+@keyframes sheet-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-panel-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sheet-panel-out-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
 }
 
 @layer base {
   html {
     @apply h-full;
+    scrollbar-gutter: stable;
   }
 
   * {

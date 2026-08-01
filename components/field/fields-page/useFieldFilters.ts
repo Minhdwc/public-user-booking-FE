@@ -14,6 +14,7 @@ export interface FieldFilterValues {
   minPrice: string;
   maxPrice: string;
   favoritesOnly: boolean;
+  nearMe: boolean;
 }
 
 export interface FieldFilterOptions {
@@ -47,7 +48,8 @@ export function hasActiveFieldFilters(values: FieldFilterValues) {
     values.venueId ||
     values.minPrice ||
     values.maxPrice ||
-    values.favoritesOnly,
+    values.favoritesOnly ||
+    values.nearMe,
   );
 }
 
@@ -63,6 +65,7 @@ export function useFieldFilters() {
     minPrice: searchParams.get('minPrice') ?? '',
     maxPrice: searchParams.get('maxPrice') ?? '',
     favoritesOnly: searchParams.get('favorites') === '1',
+    nearMe: searchParams.get('near') === '1',
   };
 
   const page = Math.max(1, Number(searchParams.get('page') || '1'));

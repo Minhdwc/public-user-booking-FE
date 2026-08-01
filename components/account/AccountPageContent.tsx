@@ -1,15 +1,18 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
+import { useState } from 'react';
+
 import { ChangePasswordForm } from '@/components/account/ChangePasswordForm';
 import { PaymentMethodsSection } from '@/components/account/PaymentMethodsSection';
 import { ProfileForm } from '@/components/account/ProfileForm';
 import { ErrorState } from '@/components/common/ErrorState';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMe, type AccountMe } from '@/lib/api/account';
-import { useState } from 'react';
 
 export function AccountPageContent() {
   const [account, setAccount] = useState<AccountMe | null>(null);
@@ -49,9 +52,14 @@ export function AccountPageContent() {
       />
 
       <Card className="border-border/70 shadow-sm">
-        <CardHeader>
-          <CardTitle>Hồ sơ</CardTitle>
-          <CardDescription>Cập nhật thông tin cá nhân và ảnh đại diện</CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+          <div className="space-y-1">
+            <CardTitle>Hồ sơ</CardTitle>
+            <CardDescription>Cập nhật thông tin cá nhân và ảnh đại diện</CardDescription>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/account/profile">Mở trang hồ sơ</Link>
+          </Button>
         </CardHeader>
         <CardContent>
           <ProfileForm account={currentAccount} onUpdated={setAccount} />
@@ -59,9 +67,14 @@ export function AccountPageContent() {
       </Card>
 
       <Card className="border-border/70 shadow-sm">
-        <CardHeader>
-          <CardTitle>Đổi mật khẩu</CardTitle>
-          <CardDescription>Đảm bảo mật khẩu mạnh và khác mật khẩu cũ</CardDescription>
+        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+          <div className="space-y-1">
+            <CardTitle>Đổi mật khẩu</CardTitle>
+            <CardDescription>Đảm bảo mật khẩu mạnh và khác mật khẩu cũ</CardDescription>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/account/change-password">Mở trang đổi mật khẩu</Link>
+          </Button>
         </CardHeader>
         <CardContent>
           <ChangePasswordForm />

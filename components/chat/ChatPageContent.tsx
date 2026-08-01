@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
+  appendChatMessage,
   chatKeys,
   useChatConversations,
   useChatMessages,
@@ -90,10 +91,9 @@ function MessagePanel({ conversationId }: { conversationId: string }) {
 
     const handleMessage = (message: ChatMessage) => {
       if (message.conversationId !== conversationId) return;
-      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(conversationId), (current) => {
-        if (current?.some((row) => row.id === message.id)) return current;
-        return [...(current ?? []), message];
-      });
+      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(conversationId), (current) =>
+        appendChatMessage(current, message),
+      );
     };
 
     socket.on('chat:message', handleMessage);
