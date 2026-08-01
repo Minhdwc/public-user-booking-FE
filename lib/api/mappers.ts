@@ -1,4 +1,4 @@
-import { IEntityImage, ICourt, ISport, IVenue } from '@/lib/api/types';
+import { IEntityImage, ICourt, ICourtWithSport, IVenue } from '@/lib/api/types';
 
 type VenueApiPayload = IVenue & {
   address?: string;
@@ -11,7 +11,7 @@ function buildVenueLocation(venue: VenueApiPayload) {
   return [venue.address, venue.district, venue.city].filter(Boolean).join(', ');
 }
 
-export function hasSport(court: ICourt): court is ICourt & { sport: ISport } {
+export function hasSport(court: ICourt): court is ICourtWithSport {
   return court.sport != null;
 }
 

@@ -21,7 +21,7 @@ import { getCourtsPage } from '@/lib/api/courts';
 import { hasSport } from '@/lib/api/mappers';
 import { useUserLocation } from '@/lib/hooks/use-user-location';
 import { useFavoriteVenueIds } from '@/lib/queries/favorites.query';
-import { ICourt } from '@/lib/api/types';
+import { ICourtWithSport } from '@/lib/api/types';
 import { formatDistanceKm, getCourtDistanceKm } from '@/lib/utils/geo';
 import { cn } from '@/lib/utils';
 
@@ -44,7 +44,10 @@ function FieldCardSkeleton() {
   );
 }
 
-function sortCourtsByDistance(courts: ICourt[], userLocation: { latitude: number; longitude: number }) {
+function sortCourtsByDistance(
+  courts: ICourtWithSport[],
+  userLocation: { latitude: number; longitude: number },
+) {
   return [...courts].sort((a, b) => {
     const distanceA = getCourtDistanceKm(a, userLocation) ?? Number.POSITIVE_INFINITY;
     const distanceB = getCourtDistanceKm(b, userLocation) ?? Number.POSITIVE_INFINITY;
@@ -114,7 +117,7 @@ export function FieldsPageContent() {
 
   const filteredFields = useMemo(() => {
     if (!favoritesOnly) return fields;
-    return fields.filter((court: ICourt) => favoriteVenueIds.includes(court.venueId));
+    return fields.filter((court) => favoriteVenueIds.includes(court.venueId));
   }, [fields, favoritesOnly, favoriteVenueIds]);
 
   const sortedFields = useMemo(() => {
@@ -132,7 +135,7 @@ export function FieldsPageContent() {
     if (!nearMe || !location) return new Map<string, string>();
     return new Map<string, string>(
       sortedFields
-        .map((court: ICourt) => {
+        .map((court) => {
           const distanceKm = getCourtDistanceKm(court, location);
           return distanceKm == null
             ? null
@@ -228,7 +231,7 @@ export function FieldsPageContent() {
 
           {displayedFields.length > 0 ? (
             <div className="space-y-4">
-              {displayedFields.map((court: ICourt) => (
+              {displayedFields.map((court) => (
                 <FieldCard
                   key={court.id}
                   field={court}
