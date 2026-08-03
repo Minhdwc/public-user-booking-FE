@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { RequireAuth } from '@/components/auth/RequireAuth';
-import { FavoritesPageContent } from '@/components/favorites/FavoritesPageContent';
+import { RequireAuth } from '@/components/features/auth/RequireAuth';
+import { FavoritesPageContent } from '@/components/features/favorites/FavoritesPageContent';
 import { PageShell } from '@/components/layout/PageShell';
 
 export default function FavoritesPage() {

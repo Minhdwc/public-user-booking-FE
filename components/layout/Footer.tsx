@@ -20,7 +20,8 @@ export function Footer() {
             </span>
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-400">
-            Nền tảng đặt sân thể thao số 1 — Tìm sân dễ dàng, xem khung giờ trống trực quan, giữ chỗ tức thì và thanh toán linh hoạt trong vài thao tác.
+            Nền tảng đặt sân thể thao số 1 — Tìm sân dễ dàng, xem khung giờ trống trực quan, giữ chỗ
+            tức thì và thanh toán linh hoạt trong vài thao tác.
           </p>
           <div className="mt-6 flex gap-3">
             {[
@@ -41,22 +42,33 @@ export function Footer() {
         </div>
 
         <div className="md:col-span-3">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">Khám phá dịch vụ</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            Khám phá dịch vụ
+          </p>
           <ul className="mt-5 space-y-3 text-sm text-zinc-400">
             <li>
-              <Link href="/courts" className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300">
+              <Link
+                href="/courts"
+                className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300"
+              >
                 <LayoutGrid className="size-4 text-emerald-500" />
                 Danh sách sân thể thao
               </Link>
             </li>
             <li>
-              <Link href="/venues" className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300">
+              <Link
+                href="/venues"
+                className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300"
+              >
                 <MapPinned className="size-4 text-emerald-500" />
                 Hệ thống cơ sở
               </Link>
             </li>
             <li>
-              <Link href="/bookings" className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300">
+              <Link
+                href="/bookings"
+                className="inline-flex items-center gap-2 transition-colors hover:text-emerald-300"
+              >
                 <CalendarDays className="size-4 text-emerald-500" />
                 Lịch đã đặt
               </Link>
@@ -65,7 +77,9 @@ export function Footer() {
         </div>
 
         <div className="md:col-span-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">Liên hệ & Hỗ trợ</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            Liên hệ & Hỗ trợ
+          </p>
           <ul className="mt-5 space-y-3.5 text-sm text-zinc-400">
             <li className="flex items-center gap-2.5">
               <Mail className="size-4 shrink-0 text-emerald-500" />

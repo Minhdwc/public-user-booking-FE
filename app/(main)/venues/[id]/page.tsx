@@ -1,5 +1,5 @@
 import { PageShell } from '@/components/layout/PageShell';
-import { VenueDetailContent } from '@/components/venue/VenueDetailContent';
+import { VenueDetailContent } from '@/components/features/venue/VenueDetailContent';
 
 interface VenueDetailPageProps {
   params: Promise<{ id: string }>;

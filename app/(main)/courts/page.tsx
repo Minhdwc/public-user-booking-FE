@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { FieldsPageContent } from '@/components/field/fields-page';
+import { FieldsPageContent } from '@/components/features/field/fields-page';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function CourtsPageSkeleton() {
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col lg:flex-row">
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col lg:flex-row">
       <aside className="flex w-full shrink-0 flex-col bg-background lg:w-105 xl:w-110">
         <div className="sticky top-0 z-10 border-b border-border/60 bg-card/95 px-4 py-5">
           <Skeleton className="h-4 w-20" />

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { VerifyEmailContent } from '@/components/auth/VerifyEmailContent';
+import { VerifyEmailContent } from '@/components/features/auth/VerifyEmailContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function VerifyEmailPage() {

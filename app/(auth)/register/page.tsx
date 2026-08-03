@@ -1,5 +1,5 @@
-import { GuestOnly } from '@/components/auth/GuestOnly';
-import { RegisterForm } from '@/components/auth/RegisterForm';
+import { GuestOnly } from '@/components/features/auth/GuestOnly';
+import { RegisterForm } from '@/components/features/auth/RegisterForm';
 
 export default function RegisterPage() {
   return (

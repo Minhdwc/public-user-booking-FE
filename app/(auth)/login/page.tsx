@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { GuestOnly } from '@/components/auth/GuestOnly';
-import { LoginForm } from '@/components/auth/LoginForm';
+import { GuestOnly } from '@/components/features/auth/GuestOnly';
+import { LoginForm } from '@/components/features/auth/LoginForm';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {

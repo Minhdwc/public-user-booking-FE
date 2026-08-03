@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { FavoritesPageContent } from '@/components/favorites/FavoritesPageContent';
-import { NotificationsPageContent } from '@/components/notifications/NotificationsPageContent';
+import { FavoritesPageContent } from '@/components/features/favorites/FavoritesPageContent';
+import { NotificationsPageContent } from '@/components/features/notifications/NotificationsPageContent';
 import {
   DeferredSheetBody,
   Sheet,
@@ -35,8 +35,7 @@ export function HeaderQuickSheets({ activeSheet, onActiveSheetChange }: HeaderQu
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: notificationKeys.list({}),
-      queryFn: async () =>
-        unwrapList(await notificationService.getNotifications({ limit: 50 })),
+      queryFn: async () => unwrapList(await notificationService.getNotifications({ limit: 50 })),
     });
 
     if (favoriteVenueIds.length === 0) return;

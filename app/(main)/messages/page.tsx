@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import { RequireAuth } from '@/components/auth/RequireAuth';
+import { RequireAuth } from '@/components/features/auth/RequireAuth';
 import { PageShell } from '@/components/layout/PageShell';
-import { ChatPageContent } from '@/components/chat/ChatPageContent';
+import { ChatPageContent } from '@/components/features/chat/ChatPageContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function MessagesPage() {

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { ThemeToggle } from '@/components/features/common/ThemeToggle';
 import logoSquare from '@/assets/logo/logo-9-9.png';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

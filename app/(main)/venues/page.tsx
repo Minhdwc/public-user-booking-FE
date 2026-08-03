@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { PageShell } from '@/components/layout/PageShell';
-import { VenuesPageContent } from '@/components/venue/VenuesPageContent';
+import { VenuesPageContent } from '@/components/features/venue/VenuesPageContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function VenuesPage() {

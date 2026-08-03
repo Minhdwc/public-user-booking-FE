@@ -1,5 +1,4 @@
 import { unwrapList } from '@/lib/api/response';
-import { mapVenue } from '@/lib/api/mappers';
 import type { GetVenuesParams, VenueWithFields } from '@/lib/api/types';
 import { venueService } from '@/lib/service';
 
@@ -9,9 +8,9 @@ export async function getVenues(params: GetVenuesParams = {}): Promise<VenueWith
     limit: params.limit ?? 10,
     search: params.search,
   });
-  return unwrapList(payload).map(mapVenue);
+  return unwrapList(payload);
 }
 
 export async function getVenueById(id: string): Promise<VenueWithFields> {
-  return mapVenue(await venueService.getVenue(id));
+  return venueService.getVenue(id);
 }

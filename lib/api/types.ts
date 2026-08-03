@@ -64,14 +64,11 @@ export interface IOperatingHour {
 export interface IVenue {
   id: string;
   name: string;
-  location: string;
   address?: string;
   district?: string;
   city?: string;
   longitude: number;
   latitude: number;
-  openTime?: string;
-  closeTime?: string;
   operatingHours?: IOperatingHour[];
   restStartTime?: string;
   restEndTime?: string;
@@ -82,8 +79,6 @@ export interface IVenue {
   favoriteCount?: number;
   viewCount?: number;
   venueImages?: IVenueImage[];
-  /** FE convenience — mapped từ venueImages */
-  images?: string[];
   courts?: ICourt[];
   amenities?: IAmenity[];
   createdAt: string;
@@ -101,7 +96,6 @@ export interface ICourt {
   sportId: string;
   venueId: string;
   courtImages?: ICourtImage[];
-  images?: string[];
   sport?: ISport;
   venue?: IVenue;
   createdAt: string;

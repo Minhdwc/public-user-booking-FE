@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { RequireAuth } from '@/components/auth/RequireAuth';
-import { NotificationsPageContent } from '@/components/notifications/NotificationsPageContent';
+import { RequireAuth } from '@/components/features/auth/RequireAuth';
+import { NotificationsPageContent } from '@/components/features/notifications/NotificationsPageContent';
 import { PageShell } from '@/components/layout/PageShell';
 
 export default function NotificationsPage() {

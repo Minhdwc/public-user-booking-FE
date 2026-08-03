@@ -1,5 +1,5 @@
 import { PageShell } from '@/components/layout/PageShell';
-import { FieldDetailContent } from '@/components/field/detail';
+import { FieldDetailContent } from '@/components/features/field/detail';
 
 interface CourtDetailPageProps {
   params: Promise<{ id: string }>;

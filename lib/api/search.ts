@@ -1,5 +1,4 @@
 import { unwrapList, unwrapPage } from '@/lib/api/response';
-import { mapVenue } from '@/lib/api/mappers';
 import { searchService } from '@/lib/service/search.service';
 import type { GetVenuesParams, VenueWithFields } from '@/lib/api/types';
 
@@ -10,7 +9,7 @@ export async function searchVenuesList(params: GetVenuesParams = {}): Promise<Ve
     limit: params.limit ?? 10,
   });
 
-  return unwrapList(payload).map(mapVenue);
+  return unwrapList(payload);
 }
 
 export async function searchVenuesPage(params: GetVenuesParams = {}) {
@@ -20,11 +19,7 @@ export async function searchVenuesPage(params: GetVenuesParams = {}) {
     limit: params.limit ?? 10,
   });
 
-  const page = unwrapPage(payload);
-  return {
-    ...page,
-    data: page.data.map(mapVenue),
-  };
+  return unwrapPage(payload);
 }
 
 export async function getPopularSearches(limit = 8) {
@@ -37,5 +32,5 @@ export async function getSearchSuggestions(q = '', limit = 8) {
 
 export async function getRecentlyViewedVenues(): Promise<VenueWithFields[]> {
   const payload = await searchService.getRecentlyViewed();
-  return (payload ?? []).map(mapVenue);
+  return payload ?? [];
 }

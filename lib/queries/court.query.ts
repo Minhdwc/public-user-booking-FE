@@ -2,7 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { mapCourt } from '@/lib/api/mappers';
 import { unwrapList } from '@/lib/api/response';
 import { CourtListParams } from '@/lib/api/types';
 import { courtService } from '@/lib/service';
@@ -20,16 +19,13 @@ export const courtKeys = {
 export const useCourts = (params?: CourtListParams) =>
   useQuery({
     queryKey: courtKeys.list(params ?? {}),
-    queryFn: async () => {
-      const payload = await courtService.getCourts(params, 100, 1);
-      return unwrapList(payload).map(mapCourt);
-    },
+    queryFn: async () => unwrapList(await courtService.getCourts(params, 100, 1)),
   });
 
 export const useCourt = (id: string) =>
   useQuery({
     queryKey: courtKeys.detail(id),
-    queryFn: async () => mapCourt(await courtService.getCourt(id)),
+    queryFn: () => courtService.getCourt(id),
     enabled: Boolean(id),
   });
 

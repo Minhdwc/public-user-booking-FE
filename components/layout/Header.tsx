@@ -6,11 +6,8 @@ import { usePathname } from 'next/navigation';
 import { Bell, CalendarDays, Heart, Menu, MessageSquare, User } from 'lucide-react';
 import { useState } from 'react';
 import logoSquare from '@/assets/logo/logo-9-9.png';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
-import {
-  HeaderQuickSheets,
-  type HeaderQuickSheet,
-} from '@/components/layout/HeaderQuickSheets';
+import { ThemeToggle } from '@/components/features/common/ThemeToggle';
+import { HeaderQuickSheets, type HeaderQuickSheet } from '@/components/layout/HeaderQuickSheets';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -52,7 +49,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-[1100] border-b border-border/50 bg-card/85 backdrop-blur-xl shadow-xs transition-all duration-300">
+    <header className="sticky top-0 z-1100 border-b border-border/50 bg-card/85 backdrop-blur-xl shadow-xs transition-all duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-3 group">
@@ -68,7 +65,7 @@ export function Header() {
               <span className="hidden text-base font-bold tracking-tight text-foreground sm:inline group-hover:text-primary transition-colors">
                 Minh Đức <span className="text-primary font-extrabold">Sport</span>
               </span>
-              <span className="hidden text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline">
+              <span className="hidden text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:inline">
                 Sân tập & Đặt lịch 24/7
               </span>
               <span className="text-sm font-bold tracking-tight text-foreground sm:hidden">
@@ -107,23 +104,21 @@ export function Header() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="hidden rounded-full font-medium sm:inline-flex hover:bg-emerald-500/10 hover:text-primary transition-colors"
+                className="hidden rounded-full border border-border/70 font-medium sm:inline-flex hover:bg-red-500/10 hover:text-red-500 transition-colors"
                 onClick={() => openSheet('favorites')}
               >
                 <Heart className="size-4 text-rose-500 fill-rose-500/20" />
-                Yêu thích
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="relative hidden rounded-full font-medium sm:inline-flex hover:bg-emerald-500/10 hover:text-primary transition-colors"
+                className="hidden rounded-full border border-border/70 font-medium sm:inline-flex hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
                 onClick={() => openSheet('notifications')}
               >
-                <Bell className="size-4 text-emerald-600 dark:text-emerald-400" />
-                Thông báo
+                <Bell className="size-4 text-blue-600 dark:text-blue-400" />
                 {unreadCount > 0 ? (
-                  <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-pulse">
+                  <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-xs font-bold text-destructive-foreground animate-pulse">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 ) : null}
@@ -146,7 +141,9 @@ export function Header() {
                       <User className="size-4 text-primary" />
                     )}
                   </span>
-                  <span className="hidden max-w-32 truncate text-sm font-semibold sm:inline">{user.name}</span>
+                  <span className="hidden max-w-32 truncate text-sm font-semibold sm:inline">
+                    {user.name}
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-lg">

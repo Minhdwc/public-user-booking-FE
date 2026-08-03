@@ -51,8 +51,9 @@ export function useSendChatMessage(conversationId: string) {
   return useMutation({
     mutationFn: (content: string) => chatService.sendMessage(conversationId, content),
     onSuccess: (message: ChatMessage) => {
-      queryClient.setQueryData<ChatMessage[]>(chatKeys.messages(conversationId), (current: ChatMessage[] | undefined) =>
-        appendChatMessage(current, message),
+      queryClient.setQueryData<ChatMessage[]>(
+        chatKeys.messages(conversationId),
+        (current: ChatMessage[] | undefined) => appendChatMessage(current, message),
       );
       void queryClient.invalidateQueries({ queryKey: chatKeys.conversations() });
     },

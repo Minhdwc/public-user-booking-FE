@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { RequireAuth } from '@/components/auth/RequireAuth';
-import { CheckoutPageContent } from '@/components/checkout/CheckoutPageContent';
+import { RequireAuth } from '@/components/features/auth/RequireAuth';
+import { CheckoutPageContent } from '@/components/features/checkout/CheckoutPageContent';
 import { PageShell } from '@/components/layout/PageShell';
 
 export default function CheckoutPage() {

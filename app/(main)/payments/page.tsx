@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { PageShell } from '@/components/layout/PageShell';
-import { PaymentsResultContent } from '@/components/payment/PaymentsResultContent';
+import { PaymentsResultContent } from '@/components/features/payment/PaymentsResultContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PaymentsPage() {
