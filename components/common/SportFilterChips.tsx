@@ -51,13 +51,13 @@ export function SportFilterChips({
             type="button"
             onClick={() => onSelect(item.id)}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all',
+              'inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-200 cursor-pointer',
               active
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'border border-border/70 bg-card text-muted-foreground hover:border-primary/30 hover:bg-accent hover:text-foreground',
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 dark:bg-emerald-500 dark:text-emerald-950 font-bold scale-[1.02]'
+                : 'border border-border/70 bg-card/90 text-muted-foreground hover:border-emerald-500/40 hover:bg-emerald-550/5 hover:text-foreground hover:shadow-xs',
             )}
           >
-            <Icon className="size-3.5 shrink-0" />
+            <Icon className={cn("size-4 shrink-0", active ? "text-white dark:text-emerald-950" : "text-emerald-600 dark:text-emerald-400")} />
             {item.name}
           </button>
         );

@@ -52,25 +52,32 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-[1100] border-b border-border/70 bg-card/90 backdrop-blur-md">
+    <header className="sticky top-0 z-[1100] border-b border-border/50 bg-card/85 backdrop-blur-xl shadow-xs transition-all duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image
-              src={logoSquare}
-              alt="Minh Đức Booking Sport"
-              className="size-9 rounded-xl object-cover shadow-sm"
-              priority
-            />
-            <span className="hidden text-lg font-bold tracking-tight text-foreground sm:inline">
-              Minh Đức Booking Sport
-            </span>
-            <span className="text-base font-bold tracking-tight text-foreground sm:hidden">
-              MĐ Booking
-            </span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative overflow-hidden rounded-xl shadow-xs transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src={logoSquare}
+                alt="Minh Đức Booking Sport"
+                className="size-10 object-cover"
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="hidden text-base font-bold tracking-tight text-foreground sm:inline group-hover:text-primary transition-colors">
+                Minh Đức <span className="text-primary font-extrabold">Sport</span>
+              </span>
+              <span className="hidden text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline">
+                Sân tập & Đặt lịch 24/7
+              </span>
+              <span className="text-sm font-bold tracking-tight text-foreground sm:hidden">
+                MĐ Sport
+              </span>
+            </div>
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => {
               const active = isNavActive(pathname, item.href);
               return (
@@ -78,12 +85,13 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'relative py-5 text-sm font-medium transition-colors',
-                    active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+                    'relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
+                    active
+                      ? 'bg-primary/10 text-primary font-semibold shadow-2xs'
+                      : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
                   )}
                 >
                   {item.label}
-                  {active && <span className="absolute bottom-0 left-0 h-0.5 w-full bg-primary" />}
                 </Link>
               );
             })}
@@ -99,23 +107,23 @@ export function Header() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="hidden rounded-lg sm:inline-flex"
+                className="hidden rounded-full font-medium sm:inline-flex hover:bg-emerald-500/10 hover:text-primary transition-colors"
                 onClick={() => openSheet('favorites')}
               >
-                <Heart className="size-4" />
+                <Heart className="size-4 text-rose-500 fill-rose-500/20" />
                 Yêu thích
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="relative hidden rounded-lg sm:inline-flex"
+                className="relative hidden rounded-full font-medium sm:inline-flex hover:bg-emerald-500/10 hover:text-primary transition-colors"
                 onClick={() => openSheet('notifications')}
               >
-                <Bell className="size-4" />
+                <Bell className="size-4 text-emerald-600 dark:text-emerald-400" />
                 Thông báo
                 {unreadCount > 0 ? (
-                  <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                  <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-pulse">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 ) : null}
@@ -128,9 +136,9 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="gap-2 rounded-lg border-border/70 bg-card shadow-sm"
+                  className="gap-2 rounded-full border-border/70 bg-card/80 px-3 shadow-xs hover:border-primary/40 transition-all"
                 >
-                  <span className="flex size-7 items-center justify-center overflow-hidden rounded-lg bg-primary/10">
+                  <span className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-primary/15">
                     {user.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={user.avatarUrl} alt="" className="size-full object-cover" />
@@ -138,7 +146,7 @@ export function Header() {
                       <User className="size-4 text-primary" />
                     )}
                   </span>
-                  <span className="hidden max-w-32 truncate sm:inline">{user.name}</span>
+                  <span className="hidden max-w-32 truncate text-sm font-semibold sm:inline">{user.name}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-lg">
