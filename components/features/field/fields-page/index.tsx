@@ -176,10 +176,10 @@ export const FieldsPageContent = () => {
   const isLoadingList = isLocating || fieldsQuery.isLoading;
 
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] flex-col lg:flex-row">
+    <div className="flex h-[calc(100dvh-4rem)] overflow-hidden flex-col lg:flex-row">
       <aside
         className={cn(
-          'flex w-full shrink-0 flex-col bg-background lg:w-105 xl:w-110',
+          'flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden bg-background lg:w-105 xl:w-110',
           showMapMobile ? 'hidden lg:flex' : 'flex',
         )}
       >
@@ -192,7 +192,7 @@ export const FieldsPageContent = () => {
           onNearMeToggle={handleNearMeToggle}
         />
 
-        <div className="flex-1 overflow-y-auto bg-muted/20 px-3 py-4 sm:px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto bg-muted/20 px-3 py-4 sm:px-4">
           {isLoadingList ? (
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, index) => (
@@ -254,7 +254,7 @@ export const FieldsPageContent = () => {
 
       <div
         className={cn(
-          'relative min-h-0 flex-1 bg-muted/40',
+          'relative h-full min-h-0 flex-1 bg-muted/40',
           showMapMobile ? 'flex' : 'hidden lg:flex',
         )}
       >

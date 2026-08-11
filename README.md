@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Public Web — Minh Đức Sport
 
-## Getting Started
+Ứng dụng web dành cho **người chơi**: tìm cơ sở/sân, đặt lịch, thanh toán, chat với chủ sân, quản lý tài khoản.
 
-First, run the development server:
+| | |
+|---|---|
+| **Repo** | [Minhdwc/public-user-booking-FE](https://github.com/Minhdwc/public-user-booking-FE) |
+| **Port dev** | `3000` |
+| **Backend** | `http://localhost:3001/api/v1` |
+
+## Tech stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4**, Radix UI / shadcn
+- **TanStack Query**, **Zustand**, **Axios**
+- **Socket.io** (chat, thông báo realtime)
+- **Leaflet** (bản đồ sân)
+- **Zod** + **react-hook-form**
+
+## Yêu cầu
+
+- Node.js 20+
+- Backend API đang chạy (xem repo `BE-booking-sport`)
+
+## Cài đặt & chạy local
 
 ```bash
+npm install
+# Tạo file .env (xem mục Biến môi trường bên dưới)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Biến môi trường
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Tạo file `.env` ở thư mục gốc:
 
-## Learn More
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+BACKEND_URL=http://localhost:3001
+```
 
-To learn more about Next.js, take a look at the following resources:
+| Biến | Mô tả |
+|------|--------|
+| `NEXT_PUBLIC_API_URL` | Base URL API dùng trên client |
+| `BACKEND_URL` | Target cho Next.js rewrite `/api/v1/*` → backend |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js proxy request `/api/v1/*` sang backend qua `next.config.ts`, giúp tránh CORS khi dev.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+| Lệnh | Mô tả |
+|------|--------|
+| `npm run dev` | Chạy dev server (port 3000) |
+| `npm run build` | Build production |
+| `npm run start` | Chạy bản build |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier format |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tính năng chính
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Module | Route | Mô tả |
+|--------|-------|--------|
+| Trang chủ | `/` | Tìm kiếm, gợi ý |
+| Sân | `/courts`, `/courts/[id]` | Danh sách (map + filter), chi tiết & đặt slot |
+| Cơ sở | `/venues`, `/venues/[id]` | Danh sách & chi tiết cơ sở |
+| Đặt sân | `/bookings`, `/checkout` | Lịch đặt, thanh toán |
+| Chat | `/messages` | Nhắn tin với cơ sở |
+| Yêu thích | `/favorites` | Sân/cơ sở đã lưu |
+| Thông báo | `/notifications` | Thông báo realtime |
+| Tài khoản | `/account/*` | Hồ sơ, đổi mật khẩu |
+| Auth | `/login`, `/register`, `/verify-email` | Đăng nhập, đăng ký, xác thực email |
+
+## Cấu trúc thư mục
+
+```
+app/                    # Routes & layouts (Next.js App Router)
+components/
+  features/             # UI theo domain (field, venue, booking, chat, …)
+  layout/               # Header, Footer
+  providers/            # Auth, socket, theme
+  ui/                   # Component UI cơ bản
+lib/
+  api/                  # REST client & modules
+  service/              # Business logic
+  queries/              # TanStack Query hooks
+  stores/               # Zustand (auth)
+  hooks/, utils/, validations/
+```
+
+## Hệ sinh thái
+
+Repo này là một phần của hệ thống đặt sân thể thao:
+
+| Repo | Vai trò | Port |
+|------|---------|------|
+| **public-user-booking-FE** (repo này) | Web người dùng | 3000 |
+| [website_booking_FE_ERP](https://github.com/Minhdwc/website_booking_FE_ERP) | Dashboard chủ sân / admin | 3002 |
+| [BE-booking-sport](https://github.com/Minhdwc/BE-booking-sport) | API NestJS | 3001 |
+| Mobile (Expo) | App iOS/Android | — |
+
+## Ghi chú phát triển
+
+- Ảnh sân (`courtImages`) và ảnh cơ sở (`venueImages`) là **riêng biệt** — trang chi tiết sân chỉ hiển thị `courtImages`.
+- Chạy `npm run build` trước khi push để kiểm tra TypeScript & build.
